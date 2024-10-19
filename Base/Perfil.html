@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/NavFoot.css">
+    <link rel="stylesheet" href="css/SPerfil.css">
+
+</head>
+
+<body>
+    <!-- Nav -->
+    <header>
+        <div class="logo">
+            <img src="Recursos/Icon2.png" alt="Logo de CursoNauta" class="logo-img">
+            <h1>CursoNauta</h1>
+        </div>
+
+        <!-- Barra -->
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar cursos...">
+            <button class="search-button" id="search-btn">
+                <span class="material-icons">search</span>
+            </button>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="Principal.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-btn">Categorías</a>
+                    <ul class="dropdown-content">
+                        <li><a href="All.html">Diseño</a></li>
+                        <li><a href="All.html">Ilustración</a></li>
+                        <li><a href="All.html">Animación</a></li>
+                        <li><a href="All.html">Fotografía</a></li>
+                    </ul>
+                </li>
+                <li><a href="All.html">Cursos</a></li>
+
+            </ul>
+        </nav>
+
+        <div class="user-profile">
+            <a href="Perfil.html" class="profile-toggle">
+                <img src="Recursos/Perfil.jpg" alt="Usuario" class="user-img">
+            </a>
+            <div class="user-info profile-toggle">
+                <p class="user-name">Celes</p>
+                <p class="user-role">Estudiante</p>
+            </div>
+
+            <!-- Menú desplegable -->
+            <ul class="dropdown-menu">
+                <li><a href="Perfil.html">Mi perfil</a></li>
+                <li><a href="Mensajes.html">Mis mensajes</a></li>
+                <li><a href="Kardex.html">Kardex</a></li>
+                <li><a href="Ventas.html">Mis Ventas</a></li>
+                <li><a href="Admi.html">Admi</a></li>
+                <li><a href="Login.html">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="edit-profile-container">
+        <h2>Editar Perfil</h2>
+
+        <div class="profile-pic">
+            <img src="Recursos/Perfil.jpg" alt="Foto de Perfil">
+        </div>
+
+        <button id="edit-btn">Editar</button>
+
+        <form id="profile-form" action="#" method="POST">
+            <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
+            <label for="rol">Rol</label>
+            <select id="rol" name="rol" disabled>
+                <option value="estudiante" selected>Estudiante</option>
+                <option value="instructor">Instructor</option>
+            </select>
+
+            <label for="nombre">Nombre Completo</label>
+            <input type="text" class="inputext" id="nombre" name="nombre" placeholder="Ingresa tu nombre completo" value="Celes" disabled>
+
+            <label for="usuario">Usuario</label>
+            <input type="text" class="inputext" id="usuario" name="usuario" placeholder="Ingresa tu nombre de usuario" value="celes_user" disabled>
+
+            <label for="genero">Género</label>
+            <select id="genero" name="genero" disabled>
+                <option value="femenino">Femenino</option>
+                <option value="masculino">Masculino</option>
+                <option value="otro">Otro</option>
+            </select>
+
+            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="2000-01-01" disabled>
+
+            <label for="correo">Correo Electrónico</label>
+            <input type="email" id="correo" name="correo" placeholder="Ingresa tu correo electrónico" value="celes@example.com" disabled>
+
+            <label for="contrasena">Contraseña</label>
+            <input type="password" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" value="naranja" disabled>
+
+            <button type="submit" style="display: none;">Guardar Cambios</button>
+        </form>
+
+    </div>
+
+    <!-- Footer -->
+    <footer id="contacto">
+        <p>© 2024 CursoNauta. Todos los derechos reservados.</p>
+        <p>Contacto: info@cursonauta.com</p>
+    </footer>
+
+
+    <script src="js/JPerfil.js"></script>
+    <script src="js/Nav.js"></script>
+
+    <!-- Mensaje emergente -->
+    <div id="alert" class="alert">
+        <p id="alert-message"></p>
+    </div>
+
+    <div id="error-alert" class="alert"> 
+        <p id="error-message"></p>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Kardex de Cursos</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/NavFoot.css">
+    <link rel="stylesheet" href="css/SKardex.css">
+
+</head>
+
+<body>
+     <!-- Nav -->
+     <header>
+        <div class="logo">
+            <img src="Recursos/Icon2.png" alt="Logo de CursoNauta" class="logo-img">
+            <h1>CursoNauta</h1>
+        </div>
+
+        <!-- Barra -->
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar cursos...">
+            <button class="search-button" id="search-btn">
+                <span class="material-icons">search</span>
+            </button>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="Principal.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-btn">Categorías</a>
+                    <ul class="dropdown-content">
+                        <li><a href="All.html">Diseño</a></li>
+                        <li><a href="All.html">Ilustración</a></li>
+                        <li><a href="All.html">Animación</a></li>
+                        <li><a href="All.html">Fotografía</a></li>
+                    </ul>
+                </li>
+                <li><a href="All.html">Cursos</a></li>
+
+            </ul>
+        </nav>
+
+        <div class="user-profile">
+            <a href="Perfil.html" class="profile-toggle">
+                <img src="Recursos/Perfil.jpg" alt="Usuario" class="user-img">
+            </a>
+            <div class="user-info profile-toggle">
+                <p class="user-name">Celes</p>
+                <p class="user-role">Estudiante</p>
+            </div>
+
+            <!-- Menú desplegable -->
+            <ul class="dropdown-menu">
+                <li><a href="Perfil.html">Mi perfil</a></li>
+                <li><a href="Mensajes.html">Mis mensajes</a></li>
+                <li><a href="Kardex.html">Kardex</a></li>
+                <li><a href="Ventas.html">Mis Ventas</a></li>
+                <li><a href="Admi.html">Admi</a></li>
+                <li><a href="Login.html">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Cursos y Filtros -->
+    <div class="container">
+        <div class="kardex-section">
+            <!-- Filtros -->
+            <div class="filters">
+                <h3>Filtrar cursos</h3>
+
+                <!-- Rango de Fechas -->
+                <div class="filter-date">
+                    <label for="start-date">Fecha de inscripción (inicio)</label>
+                    <input type="date" id="start-date">
+                    <label for="end-date">Fecha de inscripción (fin)</label>
+                    <input type="date" id="end-date">
+                </div>
+
+                <!-- Categoría -->
+                <div class="filter-category">
+                    <label for="category">Categoría</label>
+                    <select id="category">
+                        <option value="all">Todas las categorías</option>
+                        <option value="web">Desarrollo Web</option>
+                        <option value="programming">Programación</option>
+                        <option value="design">Diseño</option>
+                    </select>
+                </div>
+
+                <!-- Cursos Terminados -->
+                <div class="filter-status">
+                    <label for="completed">Estado del Curso</label>
+                    <select id="completed">
+                        <option value="all">Todos</option>
+                        <option value="completed">Solo cursos terminados</option>
+                        <option value="incomplete">Solo cursos activos</option>
+                    </select>
+                </div>
+
+                <!-- Aplicar Filtros -->
+                <button class="apply-filters">Aplicar filtros</button>
+            </div>
+
+            <!-- Cursos Kardex -->
+            <div class="courses-kardex">
+                <h2>Kardex</h2>
+                <table class="courses-table">
+                    <thead>
+                        <tr>
+                            <th>Curso</th>
+                            <th>Fecha de Inscripción</th>
+                            <th>Último Acceso</th>
+                            <th>Progreso</th>
+                            <th>Fecha de Terminación</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Curso de Diseño Web</td>
+                            <td>15/01/2024</td>
+                            <td>10/09/2024</td>
+                            <td>75%</td>
+                            <td>N/A</td>
+                            <td>Desarrollo Web</td>
+                            <td class="status incomplete">Incompleto</td>
+                        </tr>
+                        <tr>
+                            <td>Curso de Programación en Python</td>
+                            <td>05/02/2024</td>
+                            <td>15/09/2024</td>
+                            <td>100%</td>
+                            <td>15/09/2024</td>
+                            <td>Programación</td>
+                            <td class="status completed">Completo</td>
+                        </tr>
+                        <tr>
+                            <td>Curso de Marketing Digital</td>
+                            <td>10/03/2024</td>
+                            <td>12/09/2024</td>
+                            <td>50%</td>
+                            <td>N/A</td>
+                            <td>Marketing</td>
+                            <td class="status incomplete">Incompleto</td>
+                        </tr>
+                        <tr>
+                            <td>Curso de Fotografía Profesional</td>
+                            <td>20/04/2024</td>
+                            <td>14/09/2024</td>
+                            <td>90%</td>
+                            <td>N/A</td>
+                            <td>Diseño</td>
+                            <td class="status incomplete">Incompleto</td>
+                        </tr>
+                        <tr>
+                            <td>Curso de Desarrollo en JavaScript</td>
+                            <td>15/05/2024</td>
+                            <td>16/09/2024</td>
+                            <td>100%</td>
+                            <td>16/09/2024</td>
+                            <td>Desarrollo Web</td>
+                            <td class="status completed">Completo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contacto">
+        <p>© 2024 CursoNauta. Todos los derechos reservados.</p>
+        <p>Contacto: info@cursonauta.com</p>
+    </footer>
+
+    <script src="js/Nav.js"></script>
+
+</body>
+
+</html>

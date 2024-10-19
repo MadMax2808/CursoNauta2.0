@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajes Privados</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/NavFoot.css">
+    <link rel="stylesheet" href="css/SMensajes.css">
+</head>
+
+<body>
+    <!-- Head -->
+    <header>
+        <div class="logo">
+            <img src="Recursos/Icon2.png" alt="Logo de CursoNauta" class="logo-img">
+            <h1>CursoNauta</h1>
+        </div>
+
+        <!-- Barra -->
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar cursos...">
+            <button class="search-button" id="search-btn">
+                <span class="material-icons">search</span>
+            </button>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="Principal.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-btn">Categorías</a>
+                    <ul class="dropdown-content">
+                        <li><a href="All.html">Diseño</a></li>
+                        <li><a href="All.html">Ilustración</a></li>
+                        <li><a href="All.html">Animación</a></li>
+                        <li><a href="All.html">Fotografía</a></li>
+                    </ul>
+                </li>
+                <li><a href="All.html">Cursos</a></li>
+
+            </ul>
+        </nav>
+
+        <div class="user-profile">
+            <a href="Perfil.html" class="profile-toggle">
+                <img src="Recursos/Perfil.jpg" alt="Usuario" class="user-img">
+            </a>
+            <div class="user-info profile-toggle">
+                <p class="user-name">Celes</p>
+                <p class="user-role">Estudiante</p>
+            </div>
+
+            <!-- Menú desplegable -->
+            <ul class="dropdown-menu">
+                <li><a href="Perfil.html">Mi perfil</a></li>
+                <li><a href="Mensajes.html">Mis mensajes</a></li>
+                <li><a href="Kardex.html">Kardex</a></li>
+                <li><a href="Ventas.html">Mis Ventas</a></li>
+                <li><a href="Admi.html">Admi</a></li>
+                <li><a href="Login.html">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Instructores</h2>
+            <ul>
+                <li>
+                    <img src="Recursos/Perfil2.jpg" alt="Instructor 1" class="instructor-img">
+                    <span>Ana Gómez</span>
+                </li>
+                <li>
+                    <img src="Recursos/Perfil3.jpg" alt="Instructor 2" class="instructor-img">
+                    <span>Lizbeth </span>
+                </li>
+
+            </ul>
+        </aside>
+        <main class="main-content">
+            <section class="messages">
+                <h2>Mensajes Privados</h2>
+                
+                <div class="message-container">
+
+                    <div class="message">
+                        <img src="Recursos/Perfil.jpg" alt="Usuario 1" class="user-img">
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="user-name2">Celes</span>
+                                <span class="message-time">2024-09-15 14:30</span>
+                            </div>
+                            <p class="message-text">Hola, ¿podrías ayudarme con la tarea 2 del curso?</p>
+                        </div>
+                    </div>
+
+                    <div class="message instructor">
+                        <img src="Recursos/Perfil2.jpg" alt="Instructor" class="user-img">
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="user-name">Instructora Ana</span>
+                                <span class="message-time">2024-09-15 15:00</span>
+                            </div>
+                            <p class="message-text">¡Claro!</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="message-form">
+                    <textarea placeholder="Escribe tu mensaje..."></textarea>
+                    <button class="btn">Enviar</button>
+                </div>
+
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contacto">
+        <p>© 2024 CursoNauta. Todos los derechos reservados.</p>
+        <p>Contacto: info@cursonauta.com</p>
+    </footer>
+
+    <script src="js/Nav.js"></script>
+
+</body>
+
+</html>
