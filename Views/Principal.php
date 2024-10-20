@@ -16,7 +16,14 @@
 </head>
 
 <body>
-    
+
+<?php include 'Views\Parciales\Nav.php'; ?> 
+
+
+
+<?php include 'Views\Parciales\Footer.php'; ?> 
+
+<script src="Views\js"></script>
 
 </body>
 

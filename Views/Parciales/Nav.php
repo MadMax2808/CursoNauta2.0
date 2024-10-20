@@ -1,6 +1,6 @@
 <header>
         <div class="logo">
-            <img src="Recursos/Icon2.png" alt="Logo de CursoNauta" class="logo-img">
+            <img src="Views/Recursos/Icon2.png" alt="Logo de CursoNauta" class="logo-img">
             <h1>CursoNauta</h1>
         </div>
 
@@ -29,7 +29,7 @@
             </ul>
         </nav>
 
-        <div class="user-profile">
+        <div class="user-profile" id="user-profile" style="display: none;" >
             <a href="Perfil.html" class="profile-toggle">
                 <img src="Recursos/Perfil.jpg" alt="Usuario" class="user-img">
             </a>
