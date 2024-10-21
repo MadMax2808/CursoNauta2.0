@@ -29,9 +29,9 @@
             </ul>
         </nav>
 
-        <div class="user-profile" id="user-profile" style="display: none;" >
+        <div class="user-profile" id="user-profile" >
             <a href="Perfil.html" class="profile-toggle">
-                <img src="Recursos/Perfil.jpg" alt="Usuario" class="user-img">
+                <img src="Views/Recursos/Perfil.jpg" alt="Usuario" class="user-img">
             </a>
             <div class="user-info profile-toggle">
                 <p class="user-name">Celes</p>
@@ -45,7 +45,9 @@
                 <li><a href="Kardex.html">Kardex</a></li>
                 <li><a href="Ventas.html">Mis Ventas</a></li>
                 <li><a href="Admi.html">Admi</a></li>
-                <li><a href="Login.html">Cerrar Sesión</a></li>
+                <li><a href="Views\Login.php">Cerrar Sesión</a></li>
             </ul>
         </div>
 </header>
+
+
