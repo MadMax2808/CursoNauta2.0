@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="es">
+<?php
 
-<body>
+include_once 'Models\Database.php';
 
-<?php include 'Views\Principal.php'; ?> 
+// Obtener la conexión
+$database = new Database();
+$db = $database->getConnection();
 
-</body>
+// Incluir la clase Router
+include 'Models/Router.php';
 
-</html>
+// Crear una instancia del Router y cargar las rutas desde routes.php
+$router = new Router('routes.php');
+
+// Manejar la solicitud actual
+$router->handleRequest();
