@@ -11,4 +11,8 @@ return [
     'Kardex'=> 'Views/Kardex.php',
     'Admi'=> 'Views/Admi.php',
     'All'=> 'Views/All.php',
+    'Curso'=> 'Views/Curso.php',
+    'Pago'=> 'Views/Pago.php',
+    'Fin'=> 'Views/Fin.php',
+    'AddCurso'=> 'Views/AddCurso.php',
 ];

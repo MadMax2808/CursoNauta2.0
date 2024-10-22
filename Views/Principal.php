@@ -20,7 +20,7 @@
 
         <!-- Contenedor de los cursos -->
         <div class="course-grid">
-            <a href="Curso.html">
+            <a href="index.php?page=Curso">
             <div class="course-card">
                 <img src="Views\Recursos\C1.jpg" Imagen del Curso" class="course-img">
              
