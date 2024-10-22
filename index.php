@@ -6,7 +6,6 @@ include_once 'Models\Database.php';
 $database = new Database();
 $db = $database->getConnection();
 
-// Incluir la clase Router
 include 'Models/Router.php';
 
 // Crear una instancia del Router y cargar las rutas desde routes.php

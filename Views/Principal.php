@@ -8,7 +8,7 @@
 <section id="inicio" class="hero">
         <h2>Explora y Mejora tus Habilidades Creativas</h2>
         <p>Únete a una comunidad que aprende y comparte conocimientos creativos.</p>
-        <a href="All.html" class="btn">Explorar Cursos</a>
+        <a href="index.php?page=All" class="btn">Explorar Cursos</a>
 </section>
 
   <!-- Cursos -->
@@ -22,7 +22,7 @@
         <div class="course-grid">
             <a href="Curso.html">
             <div class="course-card">
-                <img src="Recursos/C1.jpg" Imagen del Curso" class="course-img">
+                <img src="Views\Recursos\C1.jpg" Imagen del Curso" class="course-img">
              
                 <h3 >Curso de Diseño Gráfico</h3>
             
@@ -35,7 +35,7 @@
            </a>  
 
             <div class="course-card">
-                <img src="Recursos/C2.jpg" alt="Imagen del Curso" class="course-img">
+                <img src="Views\Recursos\C2.jpg" alt="Imagen del Curso" class="course-img">
                 <h3>Curso de Ilustración Digital</h3>
                 <span class="course-category">Ilustración</span>
                 <div class="stars">⭐⭐⭐⭐☆</div>
@@ -46,7 +46,7 @@
 
 
             <div class="course-card">
-                <img src="Recursos/C3.jpg" alt="Imagen del Curso" class="course-img">
+                <img src="Views\Recursos\C3.jpg" alt="Imagen del Curso" class="course-img">
                 <h3>Curso de Animación 3D</h3>
                 <span class="course-category">Animación</span>
                 <div class="stars">⭐⭐⭐⭐⭐</div>
@@ -57,7 +57,7 @@
 
 
             <div class="course-card">
-                <img src="Recursos/C4.png" alt="Imagen del Curso" class="course-img">
+                <img src="Views\Recursos\C4.png" alt="Imagen del Curso" class="course-img">
                 <h3>Curso de Fotografía</h3>
                 <span class="course-category">Fotografía</span>
                 <div class="stars">⭐⭐⭐⭐☆</div>
@@ -68,7 +68,7 @@
 
 
             <div class="course-card">
-                <img src="Recursos/C5.jpeg" alt="Imagen del Curso" class="course-img">
+                <img src="Views\Recursos\C5.jpeg" alt="Imagen del Curso" class="course-img">
                 <h3>Curso de Desarrollo Web</h3>
                 <span class="course-category">Programación</span>
                 <div class="stars">⭐⭐⭐⭐⭐</div>
@@ -79,7 +79,7 @@
 
 
             <div class="course-card">
-                <img src="Recursos/C6.jpg" alt="Imagen del Curso" class="course-img">
+                <img src="Views\Recursos\C6.jpg" alt="Imagen del Curso" class="course-img">
                 <h3>Curso de Marketing Digital</h3>
                 <span class="course-category">Marketing</span>
                 <div class="stars">⭐⭐⭐⭐☆</div>

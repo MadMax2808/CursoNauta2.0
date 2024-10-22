@@ -1,6 +1,5 @@
-document.getElementById('search-btn').addEventListener('click', function() {
-    window.location.href = 'All.html';
-});
+
+
 document.querySelectorAll('.profile-toggle').forEach(element => {
     element.addEventListener('click', function(e) {
         e.preventDefault(); // Evitar que el enlace redirija inmediatamente

@@ -6,25 +6,27 @@
 
     <!-- Barra -->
     <div class="search-bar">
-        <input type="text" placeholder="Buscar cursos...">
-        <button class="search-button" id="search-btn">
-            <span class="material-icons">search</span>
-        </button>
+        <form action="index.php?page=All" method="POST">
+            <input type="text" placeholder="Buscar cursos...">
+            <button type="submit" class="search-button" id="search-btn">
+                <span class="material-icons">search</span>
+            </button>
+        </form>
     </div>
 
     <nav>
         <ul>
-            <li><a href="Principal.html">Inicio</a></li>
+            <li><a href="index.php?page=Principal">Inicio</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-btn">Categorías</a>
                 <ul class="dropdown-content">
-                    <li><a href="All.html">Diseño</a></li>
-                    <li><a href="All.html">Ilustración</a></li>
-                    <li><a href="All.html">Animación</a></li>
-                    <li><a href="All.html">Fotografía</a></li>
+                    <li><a href="index.php?page=All">Diseño</a></li>
+                    <li><a href="index.php?page=All">Ilustración</a></li>
+                    <li><a href="index.php?page=All">Animación</a></li>
+                    <li><a href="index.php?page=All">Fotografía</a></li>
                 </ul>
             </li>
-            <li><a href="All.html">Cursos</a></li>
+            <li><a href="index.php?page=All">Cursos</a></li>
 
         </ul>
     </nav>
@@ -49,17 +51,17 @@
 
             <!-- Menú desplegable según el rol del usuario -->
             <ul class="dropdown-menu">
-                <li><a href="index.php?page=perfil">Mi perfil</a></li>
+                <li><a href="index.php?page=Perfil">Mi perfil</a></li>
 
                 <?php if ($_SESSION['user_role'] == 'estudiante'): ?>
-                    <li><a href="index.php?page=mensajes">Mis Mensajes</a></li>
-                    <li><a href="index.php?page=kardex">Kardex</a></li>
+                    <li><a href="index.php?page=Mensajes">Mis Mensajes</a></li>
+                    <li><a href="index.php?page=Kardex">Kardex</a></li>
 
                 <?php elseif ($_SESSION['user_role'] == 'vendedor'): ?>
-                    <li><a href="index.php?page=ventas">Mis Ventas</a></li>
+                    <li><a href="index.php?page=Ventas">Mis Ventas</a></li>
                 <?php elseif ($_SESSION['user_role'] == 'administrador'): ?>
 
-                    <li><a href="index.php?page=admi">Administración</a></li>
+                    <li><a href="index.php?page=Admi">Administración</a></li>
                 <?php endif; ?>
 
                 <li><a href="index.php?page=logout">Cerrar Sesión</a></li>
