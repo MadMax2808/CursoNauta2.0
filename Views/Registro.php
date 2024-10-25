@@ -4,7 +4,7 @@
 
 <div class="register-container">
     <h2>Registro</h2>
-    <form action="api.php" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="accion" value="registro">
         <div class="form-group">
             <label for="photo">Cargar foto:</label>
@@ -47,7 +47,7 @@
             <label for="password">Contraseña:</label>
             <input type="password" id="password" name="contrasena" >
         </div>
-          <div id="errorMessages"></div>
+        <div id="errorMessages"></div>
 
         <button type="submit" class="btn-register">Registrar</button>
 

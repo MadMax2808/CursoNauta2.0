@@ -1,4 +1,6 @@
 document.querySelector('form').addEventListener('submit', function (event) {
+    event.preventDefault();
+
     const fullName = document.getElementById('full-name').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -71,5 +73,28 @@ document.querySelector('form').addEventListener('submit', function (event) {
         errorMessages.forEach(function (message) {
             alert(message);
         });
+        return;
     }
+
+    const formData = new FormData(this);
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const errorDiv = document.getElementById("errorMessages");
+        if (data.error) {
+            errorDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+        } else if (data.message) {
+            errorDiv.innerHTML = `<p style="color:green;">${data.message}</p>`;
+            setTimeout(() => {
+                window.location.href = 'index.php?page=Login';// Redirigir después de 3 segundos
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
 });

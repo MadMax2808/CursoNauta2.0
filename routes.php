@@ -16,5 +16,6 @@ return [
     'Fin' => 'Views/Fin.php',
     'AddCurso' => 'Views/AddCurso.php',
     'LC' => 'Controllers/LoginController.php',
+    'RC'=> 'Controllers/RegistroController.php',
 
 ];
