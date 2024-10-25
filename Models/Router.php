@@ -9,7 +9,7 @@ class Router {
         }
     }
 
-    // Método para manejar la ruta actual
+    // Método para manejar la ruta actual o por defecto
     public function handleRequest() {
         $page = isset($_GET['page']) ? $_GET['page'] : 'Principal';
 

@@ -1,5 +1,4 @@
 document.querySelector('form').addEventListener('submit', function (event) {
-    const username = document.getElementById('username').value;
     const fullName = document.getElementById('full-name').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -9,13 +8,6 @@ document.querySelector('form').addEventListener('submit', function (event) {
     const gender = document.getElementById('gender').value;
 
     let errorMessages = [];
-
-    // Usuario 
-    if (username.trim() === '') {
-        errorMessages.push('El nombre de usuario no puede estar vacío.');
-    } else if (/\s/.test(username)) {
-        errorMessages.push('El nombre de usuario no puede contener espacios en blanco.');
-    }
 
     // Nombre Completo 
     if (fullName.trim() === '') {

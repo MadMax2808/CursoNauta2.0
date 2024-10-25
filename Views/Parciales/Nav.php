@@ -33,12 +33,33 @@
 
     <div class="user-profile" id="user-profile">
         <?php
-        session_start(); // Asegúrate de tener esto al principio del archivo para iniciar la sesión.
+        session_start();
+        // Obtener el id_rol almacenado en la sesión
         ?>
         <?php if (!isset($_SESSION['user_id'])): ?>
             <!-- Si no ha iniciado sesión, muestra "Iniciar Sesión" -->
             <a href="index.php?page=Login" class="btn-login">Iniciar Sesión</a>
-        <?php else: ?>
+        <?php else:
+            // Obtener el id_rol almacenado en la sesión
+            $id_rol = $_SESSION['user_role'];  // Aquí asumo que ya tienes guardado el id_rol en la sesión
+
+            // Asignar nombres a los roles basados en el id_rol
+            $role_name = '';
+            switch ($id_rol) {
+                case 1:
+                    $role_name = 'Administrador';
+                    break;
+                case 2:
+                    $role_name = 'Instructor';
+                    break;
+                case 3:
+                    $role_name = 'Estudiante';
+                    break;
+                default:
+                    $role_name = 'Desconocido';
+                    break;
+            }
+        ?>
 
             <!-- Si ha iniciado sesión, muestra los datos del usuario y las opciones según su rol -->
             <a href="" class="profile-toggle">
@@ -46,20 +67,20 @@
             </a>
             <div class="user-info profile-toggle">
                 <p class="user-name"><?php echo $_SESSION['user_name']; ?></p>
-                <p class="user-role"><?php echo ucfirst($_SESSION['user_role']); ?></p>
+                <p class="user-role"><?php echo ucfirst($role_name); ?></p>
             </div>
 
             <!-- Menú desplegable según el rol del usuario -->
             <ul class="dropdown-menu">
                 <li><a href="index.php?page=Perfil">Mi perfil</a></li>
 
-                <?php if ($_SESSION['user_role'] == 'estudiante'): ?>
+                <?php if ($_SESSION['user_role'] == '3'): ?>
                     <li><a href="index.php?page=Mensajes">Mis Mensajes</a></li>
                     <li><a href="index.php?page=Kardex">Kardex</a></li>
 
-                <?php elseif ($_SESSION['user_role'] == 'vendedor'): ?>
+                <?php elseif ($_SESSION['user_role'] == '2'): ?>
                     <li><a href="index.php?page=Ventas">Mis Ventas</a></li>
-                <?php elseif ($_SESSION['user_role'] == 'administrador'): ?>
+                <?php elseif ($_SESSION['user_role'] == '1'): ?>
 
                     <li><a href="index.php?page=Admi">Administración</a></li>
                 <?php endif; ?>

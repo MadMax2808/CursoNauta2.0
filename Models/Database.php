@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = "localhost";  
-    private $db_name = "prueba_epica"; 
+    private $db_name = "PWCI_Curso"; 
     private $username = "root";  
     private $password = "celeste003"; 
     public $conn;

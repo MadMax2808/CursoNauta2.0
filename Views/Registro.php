@@ -1,10 +1,11 @@
-<?php include 'Views\Parciales\Head.php'; ?>
+<?php include 'Views/Parciales/Head.php'; ?>
 
 <link rel="stylesheet" href="Views/css/SLoRe.css">
 
 <div class="register-container">
     <h2>Registro</h2>
-    <form action="Login.html" method="POST" enctype="multipart/form-data">
+    <form action="api.php" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="accion" value="registro">
         <div class="form-group">
             <label for="photo">Cargar foto:</label>
             <input type="file" id="photo" name="photo" accept="image/*">
@@ -19,38 +20,34 @@
         </div>
 
         <div class="form-group">
-            <label for="username">Usuario:</label>
-            <input type="text" id="username" name="username">
-        </div>
-
-        <div class="form-group">
             <label for="full-name">Nombre Completo:</label>
             <input type="text" id="full-name" name="full_name">
         </div>
 
         <div class="form-group">
             <label for="gender">Género:</label>
-            <select id="gender" name="gender">
-                <option value="male">Masculino</option>
-                <option value="female">Femenino</option>
-                <option value="other">Otro</option>
+            <select id="gender" name="gender" >
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="Otro">Otro</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="birthdate">Fecha de Nacimiento:</label>
-            <input type="date" id="birthdate" name="birthdate">
+            <input type="date" id="birthdate" name="birthdate" >
         </div>
 
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email">
+            <input type="email" id="email" name="correo" >
         </div>
 
         <div class="form-group">
             <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" name="contrasena" >
         </div>
+          <div id="errorMessages"></div>
 
         <button type="submit" class="btn-register">Registrar</button>
 
@@ -58,10 +55,9 @@
         <div class="login-link">
             <p>¿Ya tienes cuenta? <a href="Login.html">Iniciar sesión</a></p>
         </div>
-
     </form>
 </div>
 
-<script src="Views\js\JRegistro.js"> </script>
+<script src="Views\js\JRegistro.js"></script>
 
-<?php include 'Views\Parciales\Footer.php'; ?>
+<?php include 'Views/Parciales/Footer.php'; ?>
