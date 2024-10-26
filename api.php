@@ -25,7 +25,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
     case 'POST':
         if (isset($_POST['accion']) && $_POST['accion'] === 'registro') {
-        
+
             if (!empty($_POST['full_name']) && !empty($_POST['correo']) && !empty($_POST['contrasena']) && !empty($_POST['role']) && !empty($_POST['gender']) && !empty($_POST['birthdate'])) {
                 $nombre = $_POST['full_name'];
                 $correo = $_POST['correo'];
@@ -34,20 +34,20 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $fecha_nacimiento = $_POST['birthdate'];
                 $id_rol = ($_POST['role'] === 'instructor') ? 2 : 3;
 
-                // Manejar la foto 
+                
                 $foto_avatar = null;
                 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-                    // Ruta donde se guardará la imagen
+                    
                     $targetDir = "uploads/";
                     $foto_avatar = $targetDir . basename($_FILES['photo']['name']);
 
-                    // Subir el archivo al servidor
+                 
                     if (!move_uploaded_file($_FILES['photo']['tmp_name'], $foto_avatar)) {
                         $response['error'] = "Error al subir la foto.";
                     }
                 }
 
-                // Verificar si el correo ya exigitste
+                // Verificar correo ya exigitste
                 $query = "SELECT idUsuario FROM usuarios WHERE correo = :correo";
                 $stmt = $conn->prepare($query);
                 $stmt->bindParam(':correo', $correo);
@@ -56,7 +56,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 if ($stmt->rowCount() > 0) {
                     $response['error'] = "El correo ya está registrado. Por favor, usa otro.";
                 } else {
-                    // Insertar el nuevo usuario con los nuevos campos, sin incluir fecha_registro (se maneja automáticamente)
                     $query = "INSERT INTO usuarios (nombre, genero, fecha_nacimiento, foto_avatar, correo, contrasena, id_rol) 
                               VALUES (:nombre, :genero, :fecha_nacimiento, :foto_avatar, :correo, :contrasena, :id_rol)";
                     $stmt = $conn->prepare($query);
@@ -65,7 +64,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     $stmt->bindParam(':fecha_nacimiento', $fecha_nacimiento);
                     $stmt->bindParam(':foto_avatar', $foto_avatar);
                     $stmt->bindParam(':correo', $correo);
-                    $stmt->bindParam(':contrasena', $password);  // Guardar la contraseña en texto plano
+                    $stmt->bindParam(':contrasena', $password);  
                     $stmt->bindParam(':id_rol', $id_rol);
 
                     if ($stmt->execute()) {
@@ -100,29 +99,82 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $response['message'] = "Inicio de sesión exitoso";
                 $response['user'] = $user;
             }
+        } elseif (isset($_POST['accion']) && $_POST['accion'] === 'modificar') {
+            if (!empty($_POST['idUsuario'])) {
+                $idUsuario = $_POST['idUsuario'];
+
+                $fieldsToUpdate = [];
+                $params = [];
+
+                if (!empty($_POST['full_name'])) {
+                    $fieldsToUpdate[] = "nombre = :nombre";
+                    $params[':nombre'] = $_POST['full_name'];
+                }
+
+                if (!empty($_POST['correo'])) {
+                    $fieldsToUpdate[] = "correo = :correo";
+                    $params[':correo'] = $_POST['correo'];
+                }
+
+                if (!empty($_POST['contrasena'])) {
+                    $fieldsToUpdate[] = "contrasena = :contrasena";
+                    $params[':contrasena'] = $_POST['contrasena'];
+                }
+
+                if (!empty($_POST['fecha_nacimiento'])) {
+                    $fecha_nacimiento = date('Y-m-d', strtotime($_POST['fecha_nacimiento'])); // Asegura el formato correcto
+                    $fieldsToUpdate[] = "fecha_nacimiento = :fecha_nacimiento";
+                    $params[':fecha_nacimiento'] = $fecha_nacimiento;
+                }
+
+                if (!empty($_POST['role'])) {
+                    $id_rol = intval($_POST['role']);
+                    $fieldsToUpdate[] = "id_rol = :id_rol";
+                    $params[':id_rol'] = $id_rol;
+                }
+
+                if (!empty($_POST['genero'])) {
+                    $genero = $_POST['genero'];
+                    $fieldsToUpdate[] = "genero = :genero";
+                    $params[':genero'] = $genero;
+                }
+
+                if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                    $targetDir = "uploads/";
+                    $foto_avatar = $targetDir . basename($_FILES['photo']['name']);
+                    if (move_uploaded_file($_FILES['photo']['tmp_name'], $foto_avatar)) {
+                        $fieldsToUpdate[] = "foto_avatar = :foto_avatar";
+                        $params[':foto_avatar'] = $foto_avatar;
+                    } else {
+                        $response['error'] = "Error al subir la foto.";
+                    }
+                }
+
+                // Verificar si hay al menos un campo para actualizar
+                if (count($fieldsToUpdate) > 0) {
+                    // Construimos la consulta dinámica
+                    $query = "UPDATE usuarios SET " . implode(", ", $fieldsToUpdate) . " WHERE idUsuario = :idUsuario";
+                    $stmt = $conn->prepare($query);
+
+                    // Añadir el idUsuario al array de parámetros
+                    $params[':idUsuario'] = $idUsuario;
+
+                    if ($stmt->execute($params)) {
+                        $response['message'] = "Usuario modificado con éxito";
+                    } else {
+                        $response['error'] = "Error al modificar el usuario: " . implode(" ", $stmt->errorInfo());
+                    }
+                } else {
+                    $response['error'] = "No hay campos para modificar.";
+                }
+            } else {
+                $response['error'] = "El ID de usuario es obligatorio.";
+            }
         }
+
         break;
-
-    case 'PUT':
-        parse_str(file_get_contents("php://input"), $_PUT);
-        $idUsuario = $_PUT['idUsuario'];
-        $nombre = $_PUT['nombre'];
-        $correo = $_PUT['correo'];
-
-        $query = "UPDATE usuarios SET nombre = :nombre, correo = :correo WHERE idUsuario = :idUsuario";
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':correo', $correo);
-        $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            $response['message'] = "Usuario actualizado con éxito";
-        } else {
-            $response['error'] = "Error al actualizar el usuario";
-        }
-        break;
-
     case 'DELETE':
+        //HAY QUE CAMBIAR PARA QUE EN VEZ DE QUE SE BORRE SOLO SE DESACTIVE
         $idUsuario = $_GET['idUsuario'];
         $query = "DELETE FROM usuarios WHERE idUsuario = :idUsuario";
         $stmt = $conn->prepare($query);

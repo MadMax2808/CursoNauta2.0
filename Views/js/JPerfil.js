@@ -1,4 +1,37 @@
-document.getElementById('edit-btn').addEventListener('click', function() {
+// Obtener los datos del usuario al cargar la página
+document.addEventListener('DOMContentLoaded', function () {
+    const userId = document.getElementById('userId').value;
+
+    // Hacer la solicitud GET al Api
+    fetch(`api.php?idUsuario=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+
+            console.log("Datos recibidos de la API:", data);
+
+            if (data.error) {
+                console.error('Error:', data.error);
+                return;
+            }
+
+            // Rellenar campos 
+            document.getElementById('nombre').value = data.nombre;
+            document.getElementById('rol').value = data.id_rol;
+            document.getElementById('correo').value = data.correo;
+            document.getElementById('genero').value = data.genero;
+            document.getElementById('fecha_nacimiento').value = data.fecha_nacimiento;
+            document.getElementById('contrasena').value = data.contrasena;
+
+            const profilePic = document.getElementById('profile-pic');
+            profilePic.src = data.foto_avatar ? data.foto_avatar : 'Recursos/Perfil.jpg';
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos del perfil:', error);
+        });
+});
+
+// Funcionalidad de boton Editar
+document.getElementById('edit-btn').addEventListener('click', function () {
     var form = document.getElementById('profile-form');
     var isEditing = form.classList.toggle('editing');
     var inputs = form.querySelectorAll('input, select');
@@ -12,26 +45,25 @@ document.getElementById('edit-btn').addEventListener('click', function() {
     photoInput.style.display = isEditing ? 'block' : 'none';
 });
 
-document.getElementById('profile-form').addEventListener('submit', function(event) {
+document.getElementById('profile-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Evitar la recarga de la página
+
+    const userId = document.getElementById('userId').value;
     const nombre = document.getElementById('nombre').value;
-    const usuario = document.getElementById('usuario').value;
     const correo = document.getElementById('correo').value;
     const contrasena = document.getElementById('contrasena').value;
     const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+    const rol = document.getElementById('rol').value;
+    const genero = document.getElementById('genero').value;
+    const photoInput = document.getElementById('photo').files[0]; // Acceder al archivo seleccionado
 
     let errorMessages = [];
 
-    // Validaciones solo si los campos no están vacíos
+    // Validaciones
     if (nombre.trim() === '') {
         errorMessages.push('El nombre completo no puede estar vacío.');
     } else if (!/^[a-zA-Z\s]+$/.test(nombre)) {
         errorMessages.push('El nombre completo solo debe contener letras.');
-    }
-
-    if (usuario.trim() === '') {
-        errorMessages.push('El nombre de usuario no puede estar vacío.');
-    } else if (/\s/.test(usuario)) {
-        errorMessages.push('El nombre de usuario no puede contener espacios en blanco.');
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -58,22 +90,48 @@ document.getElementById('profile-form').addEventListener('submit', function(even
         }
     }
 
-    // Validación de la fecha de nacimiento
+
     if (fechaNacimiento.trim() === '') {
         errorMessages.push('La fecha de nacimiento no puede estar vacía.');
-    } else {
-        var today = new Date();
-        var todayFormatted = today.toISOString().split('T')[0];
-        if (fechaNacimiento >= todayFormatted) {
-            errorMessages.push('La fecha de nacimiento no puede ser hoy ni una fecha futura.');
-        }
     }
 
-    // Mostrar mensajes de error
     if (errorMessages.length > 0) {
-        event.preventDefault(); 
-        errorMessages.forEach(function(message) {
+        errorMessages.forEach(function (message) {
             alert(message);
         });
+        return;
     }
+
+    // Crear un FormData para enviar datos y archivo
+    const formData = new FormData();
+    formData.append('accion', 'modificar'); // Acción para el servidor
+    formData.append('idUsuario', userId);
+    formData.append('full_name', nombre);
+    formData.append('correo', correo);
+    formData.append('contrasena', contrasena);
+    formData.append('fecha_nacimiento', fechaNacimiento);
+    formData.append('role', rol);
+    formData.append('genero', genero);
+    if (photoInput) {
+        formData.append('photo', photoInput);
+    }
+
+    // Enviar los datos al servidor con fetch
+    fetch('api.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert(data.message || 'Usuario modificado con éxito');
+                document.getElementById('edit-btn').click();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 });
+

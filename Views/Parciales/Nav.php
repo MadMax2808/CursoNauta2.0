@@ -63,7 +63,7 @@
 
             <!-- Si ha iniciado sesión, muestra los datos del usuario y las opciones según su rol -->
             <a href="" class="profile-toggle">
-                <img src="Views/Recursos/Perfil.jpg" alt="Usuario" class="user-img">
+                <img src="<?php echo $_SESSION['user_img']; ?>" alt="Usuario" class="user-img">
             </a>
             <div class="user-info profile-toggle">
                 <p class="user-name"><?php echo $_SESSION['user_name']; ?></p>

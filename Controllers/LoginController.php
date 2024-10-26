@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_id'] = $response['user']['idUsuario'];
         $_SESSION['user_name'] = $response['user']['nombre'];
         $_SESSION['user_role'] = $response['user']['id_rol'];
+        $_SESSION['user_img'] = $response['user']['foto_avatar'];
          header("Location: index.php?page=Principal");
         exit();
     }
