@@ -1,4 +1,4 @@
-// Obtener los datos del usuario al cargar la página
+// Obtener los datos del usuario 
 document.addEventListener('DOMContentLoaded', function () {
     const userId = document.getElementById('userId').value;
 
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 });
 
-// Funcionalidad de boton Editar
+// Boton Editar
 document.getElementById('edit-btn').addEventListener('click', function () {
     var form = document.getElementById('profile-form');
     var isEditing = form.classList.toggle('editing');
@@ -45,6 +45,7 @@ document.getElementById('edit-btn').addEventListener('click', function () {
     photoInput.style.display = isEditing ? 'block' : 'none';
 });
 
+//Validaciones
 document.getElementById('profile-form').addEventListener('submit', function (event) {
     event.preventDefault(); // Evitar la recarga de la página
 
@@ -133,5 +134,6 @@ document.getElementById('profile-form').addEventListener('submit', function (eve
         .catch(error => {
             console.error('Error:', error);
         });
+        
 });
 

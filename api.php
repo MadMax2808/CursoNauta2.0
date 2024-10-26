@@ -34,14 +34,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $fecha_nacimiento = $_POST['birthdate'];
                 $id_rol = ($_POST['role'] === 'instructor') ? 2 : 3;
 
-                
+
                 $foto_avatar = null;
                 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-                    
+
                     $targetDir = "uploads/";
                     $foto_avatar = $targetDir . basename($_FILES['photo']['name']);
 
-                 
+
                     if (!move_uploaded_file($_FILES['photo']['tmp_name'], $foto_avatar)) {
                         $response['error'] = "Error al subir la foto.";
                     }
@@ -64,7 +64,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     $stmt->bindParam(':fecha_nacimiento', $fecha_nacimiento);
                     $stmt->bindParam(':foto_avatar', $foto_avatar);
                     $stmt->bindParam(':correo', $correo);
-                    $stmt->bindParam(':contrasena', $password);  
+                    $stmt->bindParam(':contrasena', $password);
                     $stmt->bindParam(':id_rol', $id_rol);
 
                     if ($stmt->execute()) {
@@ -160,7 +160,26 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     $params[':idUsuario'] = $idUsuario;
 
                     if ($stmt->execute($params)) {
+                        // Si la actualización es exitosa, actualizar la sesión
+                        session_start();
+
+                        if (!empty($_POST['full_name'])) {
+                            $_SESSION['user_name'] = $_POST['full_name'];
+                        }
+
+                        if (!empty($_POST['role'])) {
+                            $_SESSION['user_role'] = $id_rol;
+                        }
+
+                        if (isset($foto_avatar)) {
+                            $_SESSION['user_img'] = $foto_avatar; // Actualizar la imagen en la sesión
+                        }
+
                         $response['message'] = "Usuario modificado con éxito";
+                        $response['user_name'] = $_SESSION['user_name'];
+                        $response['user_role'] = $_SESSION['user_role'];
+                        $response['user_img'] = $_SESSION['user_img'];
+
                     } else {
                         $response['error'] = "Error al modificar el usuario: " . implode(" ", $stmt->errorInfo());
                     }
