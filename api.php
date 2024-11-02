@@ -89,15 +89,18 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
-                // Si no existe el correo en la base de datos
+                
                 $response['error'] = "El correo no está registrado.";
+
             } elseif ($user && $password !== $user['contrasena']) {
-                // Si la contraseña es incorrecta
+
                 $response['error'] = "Contraseña incorrecta.";
+
             } else {
-                // Inicio de sesión exitoso
+
                 $response['message'] = "Inicio de sesión exitoso";
                 $response['user'] = $user;
+                
             }
         } elseif (isset($_POST['accion']) && $_POST['accion'] === 'modificar') {
             if (!empty($_POST['idUsuario'])) {
@@ -179,7 +182,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
                         $response['user_name'] = $_SESSION['user_name'];
                         $response['user_role'] = $_SESSION['user_role'];
                         $response['user_img'] = $_SESSION['user_img'];
-
                     } else {
                         $response['error'] = "Error al modificar el usuario: " . implode(" ", $stmt->errorInfo());
                     }
