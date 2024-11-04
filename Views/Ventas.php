@@ -44,7 +44,7 @@
         <div class="courses-kardex">
             <div class="courses-kardex-header">
                 <h2>Lista de Cursos</h2>
-                <a href="AddCurso.html" id="add-course-btn" class="add-course-btn"><i class="fa fa-plus"></i>
+                <a href="index.php?page=AddCurso" id="add-course-btn" class="add-course-btn"><i class="fa fa-plus"></i>
                     Agregar Curso</a>
             </div>
 

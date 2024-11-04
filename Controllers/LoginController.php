@@ -1,8 +1,8 @@
 <?php
 session_start();
-$error_correo = '';  
-$error_contrasena = '';  
-$correo_valor = '';  
+$error_correo = '';
+$error_contrasena = '';
+$correo_valor = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $correo = $_POST['correo'];
@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $correo_valor = $correo;
 
-    $url = 'http://localhost/CursoNauta2.0/api.php'; 
+    $url = 'http://localhost/CursoNauta2.0/api.php';
 
     $data = array(
         'accion' => 'inicio_sesion',
@@ -44,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($response['error'])) {
         if ($response['error'] === "El correo no está registrado.") {
             $error_correo = $response['error'];
+        } elseif ($response['error'] === "La cuenta está desactivada. Contacta al administrador.") {
+            $error_desactivada = $response['error'];
         } elseif ($response['error'] === "Contraseña incorrecta.") {
             $error_contrasena = $response['error'];
         }
@@ -52,11 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_name'] = $response['user']['nombre'];
         $_SESSION['user_role'] = $response['user']['id_rol'];
         $_SESSION['user_img'] = $response['user']['foto_avatar'];
-         header("Location: index.php?page=Principal");
+        header("Location: index.php?page=Principal");
         exit();
     }
 }
 
 
 include 'Views\Login.php';
-

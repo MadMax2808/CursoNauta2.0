@@ -4,6 +4,28 @@
 
 <?php include 'Views\Parciales\Nav.php'; ?>
 
+
+<!------------ SECCION DE OBTENER CATEGORIAS PARA MOSTRAR --------------->
+
+<?php
+$userId = $_SESSION['user_id'];
+
+require_once 'Controllers\CategoriaController.php';
+
+$categorias = ($userId) ? $controller->mostrarCategorias($userId) : [];
+?>
+
+<!------------ SECCION DE OBTENER USUARIOS --------------->
+<?php
+require_once 'Controllers/UsuarioController.php';
+
+$usuarioController = new UsuarioController();
+$usuarios = $usuarioController->mostrarUsuarios();
+$usuarioController->cambiarEstadoUsuario();
+?>
+
+<!--------------------------- SECCION DE HTML --------------------------------->
+
 <div class="admin-container">
     <div class="main-content">
         <div class="left-pane">
@@ -29,17 +51,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Juan Pérez</td>
-                            <td>01/01/2024</td>
-                            <td>Instructor</td>
-                            <td>
-                                <button>Habilitar</button>
-                                <button>Deshabilitar</button>
-                            </td>
-                        </tr>
-                        <!-- Más filas según sea necesario -->
+                        <?php if (!empty($usuarios)): ?>
+                            <?php foreach ($usuarios as $usuario): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($usuario['nombre']); ?></td>
+                                    <td><?php echo htmlspecialchars($usuario['correo']); ?></td>
+                                    <td><?php echo htmlspecialchars($usuario['fecha_registro']); ?></td>
+                                    <td><?php echo $usuario['activo'] ? 'Activo' : 'Inactivo'; ?></td>
+                                    <td> 
+                                        <?php if ($usuario['idUsuario'] == $userId): ?>
+                                <span>No puedes hacer esto</span>
+                            <?php else: ?>
+                                        <form method="POST" onsubmit="return confirmarAccion()">
+                                            <input type="hidden" name="idUsuario" value="<?php echo $usuario['idUsuario']; ?>">
+                                            <input type="hidden" name="nuevoEstado" value="<?php echo $usuario['activo'] ? 0 : 1; ?>">
+                                            <button type="submit">
+                                                <?php echo $usuario['activo'] ? 'Deshabilitar' : 'Habilitar'; ?>
+                                            </button>
+                                        </form>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5">No hay usuarios registrados.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -81,36 +119,51 @@
                         <tr>
                             <th>Título</th>
                             <th>Descripción</th>
-                            <th>Acción</th>
+                            <!-- <th>Acción</th> -->
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Seguridad y Medio Ambiente</td>
-                            <td>Aquí se estudian aspectos relacionados con la seguridad laboral, la prevención de riesgos y la protección del medio ambiente.</td>
-                            <td>
-                                <button>Editar</button>
-                                <button>Borrar</button>
-                            </td>
-                        </tr>
-
+                        <?php if (!empty($categorias)): ?>
+                            <?php foreach ($categorias as $categoria): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($categoria['nombre_categoria']); ?></td>
+                                    <td><?php echo htmlspecialchars($categoria['descripcion']); ?></td>
+                                    <!-- <td>
+                                        <button>Editar</button>
+                                        <button>Borrar</button>
+                                    </td> -->
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="3">No tienes categorías registradas.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
+
+                <!-- Agregar Categoria -->
                 <button type="button" onclick="toggleCategoryForm(true)">Agregar Nueva Categoría</button>
 
-                <div id="add-category-form" style="display: none; margin-top: 20px;">
+                <div id="add-category-form">
                     <h2>Agregar Nueva Categoría</h2>
-                    <form id="category-form">
+                    <form id="category-form" method="post" action="index.php?page=CC">
+                        <input type="hidden" id="id_creador" name="id_creador" value="<?php echo $userId; ?>">
+                        <input type="hidden" name="action" value="add">
+
                         <label for="category-title">Título:</label>
-                        <input type="text" id="category-title" name="category-title">
+                        <input type="text" id="category-title" name="nombre_categoria">
+
                         <label for="category-description">Descripción:</label>
-                        <textarea id="category-description" name="category-description" rows="4"></textarea>
+                        <textarea id="category-description" name="descripcion" rows="4"></textarea>
+
                         <div class="button-group">
                             <button type="submit">Guardar Categoría</button>
                             <button type="button" onclick="toggleCategoryForm(false)">Cancelar</button>
                         </div>
                     </form>
                 </div>
+
             </div>
 
             <!-- Sección de Reportes -->

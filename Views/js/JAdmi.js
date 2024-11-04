@@ -94,4 +94,11 @@ document.getElementById('category-form').addEventListener('submit', function(eve
     }
 });
 
+function confirmarAccion() {
+    return confirm("¿Está seguro de que desea realizar esta acción?");
+}
+
+
+
+
 

@@ -7,17 +7,23 @@
     <form action="index.php?page=LC" method="POST">
         <div class="form-group">
             <label for="email">Correo:</label>
-            <input type="email" id="email" name="correo" value="<?php echo isset($correo_valor) ? htmlspecialchars($correo_valor) : ''; ?>" required>
+            <input type="email" id="email" name="correo" value="<?php echo isset($correo_valor) ? htmlspecialchars($correo_valor) : ''; ?>">
             <?php if (!empty($error_correo)): ?>
                 <div class="error-message">
                     <p><?php echo htmlspecialchars($error_correo); ?></p>
+                </div>
+            <?php endif; ?>
+         
+            <?php if (!empty($error_desactivada)): ?>
+                <div class="error-message">
+                    <p><?php echo htmlspecialchars($error_desactivada); ?></p>
                 </div>
             <?php endif; ?>
         </div>
 
         <div class="form-group">
             <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="contrasena" required>
+            <input type="password" id="password" name="contrasena">
             <?php if (!empty($error_contrasena)): ?>
                 <div class="error-message">
                     <p><?php echo htmlspecialchars($error_contrasena); ?></p>
@@ -33,5 +39,6 @@
     </form>
 
 </div>
+<script src="Views\js\JLogin.js"> </script>
 
 </body>

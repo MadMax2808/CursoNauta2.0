@@ -89,18 +89,18 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
-                
-                $response['error'] = "El correo no está registrado.";
 
+                $response['error'] = "El correo no está registrado.";
+            } elseif ($user && $user['activo'] == 0) {
+
+                $response['error'] = "La cuenta está desactivada. Contacta al administrador.";
             } elseif ($user && $password !== $user['contrasena']) {
 
                 $response['error'] = "Contraseña incorrecta.";
-
             } else {
 
                 $response['message'] = "Inicio de sesión exitoso";
                 $response['user'] = $user;
-                
             }
         } elseif (isset($_POST['accion']) && $_POST['accion'] === 'modificar') {
             if (!empty($_POST['idUsuario'])) {
