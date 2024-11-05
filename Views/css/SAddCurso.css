@@ -95,6 +95,15 @@ label {
     color: #333;
     margin-bottom: 15px;
 }
+.add-courses-page select {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 2px solid #d0d0d0;
+    border-radius: 5px;
+    color: #333;
+    margin-bottom: 10px;
+}
 
 /* ---------------------- BOTONES ---------------------- */
 .add-courses-page button {

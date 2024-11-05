@@ -25,7 +25,7 @@ class CategoriaController
         } elseif ($action === 'edit') {
             // $this->modificarCategoria();
         } else {
-           // echo "Acción no válida.";
+            // echo "Acción no válida.";
         }
     }
     public function agregarCategoria()
@@ -52,5 +52,10 @@ class CategoriaController
     {
         $categorias = $this->categoriaModel->obtenerCategorias($id_creador);
         return $categorias;
+    }
+
+    public function obtenerCategorias()
+    {
+        return $this->categoriaModel->getAllCategorias();
     }
 }

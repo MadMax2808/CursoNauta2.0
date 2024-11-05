@@ -3,12 +3,26 @@
 <link rel="stylesheet" href="Views/css/SAddCurso.css">
 
 <?php include 'Views\Parciales\Nav.php'; ?>
+
+<!------------ SECCION DE OBTENER CATEGORIAS PARA MOSTRAR --------------->
+<?php
+require_once 'Models/CategoriaModel.php';
+require_once 'Controllers/CategoriaController.php';
+
+// Instanciamos el controlador
+$controller = new CategoriaController();
+
+// Obtenemos las categorías
+$categorias = $controller->obtenerCategorias();
+?>
+
+
 <!-- Agregar -->
 <div class="add-courses-page">
     <div class="container">
         <h2>Agregar Curso</h2>
-        <form id="course-form" action="Ventas.html" method="POST" enctype="multipart/form-data">
-            
+        <form id="course-form" action="index.php?page=CurC" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="agregarCurso">
             <!-- Contenedor de Información General -->
             <div class="general-info">
                 <div class="row">
@@ -16,10 +30,25 @@
                         <label for="course-image">Cargar imagen del curso:</label>
                         <input type="file" id="course-image" name="course_image" accept="image/*">
                     </div>
+
                     <div class="field">
                         <label for="course-title">Título del curso:</label>
                         <input type="text" id="course-title" name="course_title">
                     </div>
+
+                    <div class="field">
+                        <label for="course-category">Categoría del curso:</label>
+
+                        <select id="course-category" name="course_category">
+                            <option value=""></option>
+                            <?php foreach ($categorias as $categoria): ?>
+                                <option value="<?php echo htmlspecialchars($categoria['id_categoria']); ?>">
+                                    <?php echo htmlspecialchars($categoria['nombre_categoria']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                 </div>
 
                 <div class="row">

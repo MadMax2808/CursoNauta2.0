@@ -24,6 +24,16 @@ $usuarios = $usuarioController->mostrarUsuarios();
 $usuarioController->cambiarEstadoUsuario();
 ?>
 
+<!------------ SECCION DE CURSOS --------------->
+<?php
+require_once 'Controllers/CursoController.php';
+
+$cursoController = new CursoController();
+$cursos = $cursoController->mostrarCursos();
+$cursoController->cambiarEstadoCurso();
+?>
+
+
 <!--------------------------- SECCION DE HTML --------------------------------->
 
 <div class="admin-container">
@@ -58,17 +68,17 @@ $usuarioController->cambiarEstadoUsuario();
                                     <td><?php echo htmlspecialchars($usuario['correo']); ?></td>
                                     <td><?php echo htmlspecialchars($usuario['fecha_registro']); ?></td>
                                     <td><?php echo $usuario['activo'] ? 'Activo' : 'Inactivo'; ?></td>
-                                    <td> 
+                                    <td>
                                         <?php if ($usuario['idUsuario'] == $userId): ?>
-                                <span>No puedes hacer esto</span>
-                            <?php else: ?>
-                                        <form method="POST" onsubmit="return confirmarAccion()">
-                                            <input type="hidden" name="idUsuario" value="<?php echo $usuario['idUsuario']; ?>">
-                                            <input type="hidden" name="nuevoEstado" value="<?php echo $usuario['activo'] ? 0 : 1; ?>">
-                                            <button type="submit">
-                                                <?php echo $usuario['activo'] ? 'Deshabilitar' : 'Habilitar'; ?>
-                                            </button>
-                                        </form>
+                                            <span>No puedes hacer esto</span>
+                                        <?php else: ?>
+                                            <form method="POST" onsubmit="return confirmarAccion()">
+                                                <input type="hidden" name="idUsuario" value="<?php echo $usuario['idUsuario']; ?>">
+                                                <input type="hidden" name="nuevoEstado" value="<?php echo $usuario['activo'] ? 0 : 1; ?>">
+                                                <button type="submit">
+                                                    <?php echo $usuario['activo'] ? 'Deshabilitar' : 'Habilitar'; ?>
+                                                </button>
+                                            </form>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -96,17 +106,30 @@ $usuarioController->cambiarEstadoUsuario();
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Descripción del Curso 1</td>
-                            <td>Activo</td>
-                            <td>Laura Gómez</td>
-                            <td>
-                                <button>Habilitar</button>
-                                <button>Deshabilitar</button>
-                            </td>
-                        </tr>
-                        <!-- Más filas según sea necesario -->
+                        <?php if (!empty($cursos)): ?>
+                            <?php foreach ($cursos as $curso): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($curso['titulo']); ?></td>
+                                    <td><?php echo htmlspecialchars($curso['descripcion']); ?></td>
+                                    <td><?php echo $curso['activo'] ? 'Activo' : 'Inactivo'; ?></td>
+                                    <td><?php echo htmlspecialchars($curso['instructor_nombre']); ?></td>
+                                    <td>
+                                        <form method="POST" onsubmit="return confirmarAccion()">
+                                            <input type="hidden" name="idCurso" value="<?php echo $curso['id_curso']; ?>">
+                                            <input type="hidden" name="nuevoEstado" value="<?php echo $curso['activo'] ? 0 : 1; ?>">
+                                            <input type="hidden" name="action" value="cambiarEstadoCurso">
+                                            <button type="submit">
+                                                <?php echo $curso['activo'] ? 'Deshabilitar' : 'Habilitar'; ?>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5">No hay cursos registrados.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

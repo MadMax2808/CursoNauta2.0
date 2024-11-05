@@ -20,5 +20,6 @@ return [
     'RC'=> 'Controllers/RegistroController.php',
     'CC'=> 'Controllers/CategoriaController.php',
     'UC'=> 'Controllers/UsuarioController.php',
+    'CurC'=> 'Controllers/CursoController.php',
     
 ];

@@ -56,31 +56,31 @@ function generateLevelFields() {
         // Agregar campo para archivos adicionales
         const attachmentsLabel = document.createElement("label");
         attachmentsLabel.setAttribute("for", `level-attachments-${i}`);
-        attachmentsLabel.innerText = "Archivos adicionales (PDF, imágenes, etc.):";
+        attachmentsLabel.innerText = "Archivo adicional (PDF, imagen, etc.):";
         levelDiv.appendChild(attachmentsLabel);
 
         const attachmentsInput = document.createElement("input");
         attachmentsInput.type = "file";
-        attachmentsInput.name = `level_attachments_${i}[]`;
+        attachmentsInput.name = `level_attachments_${i}`; // Cambiado para solo un archivo
         attachmentsInput.id = `level-attachments-${i}`;
         attachmentsInput.style.width = "100%";
-        attachmentsInput.multiple = true; // Permitir múltiples archivos
         levelDiv.appendChild(attachmentsInput);
-
+        
         levelContainer.appendChild(levelDiv);
     }
 }
 
-
-document.getElementById('course-form').addEventListener('submit', function(event) {
+document.getElementById('course-form').addEventListener('submit', function (event) {
     const courseImage = document.getElementById('course-image').files.length;
     const title = document.getElementById('course-title').value.trim();
     const description = document.getElementById('course-description').value.trim();
     const levels = document.getElementById('levels').value;
     const coursePrice = document.getElementById('course-price').value;
+    const category = document.getElementById('course-category').value;
 
     let errorMessages = [];
 
+    if (category === '') errorMessages.push('Debes seleccionar una categoría para el curso.');
     if (courseImage === 0) errorMessages.push('Debes cargar una imagen del curso.');
     if (title === '') errorMessages.push('El título del curso no puede estar vacío.');
     if (description === '') errorMessages.push('La descripción del curso no puede estar vacía.');

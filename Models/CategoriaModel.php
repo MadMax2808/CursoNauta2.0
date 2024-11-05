@@ -28,7 +28,13 @@ class CategoriaModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+    public function getAllCategorias() {
+        $query = "SELECT id_categoria, nombre_categoria FROM Categorias";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 
 }
 
