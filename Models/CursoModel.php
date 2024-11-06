@@ -69,4 +69,31 @@ class CursoModel
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function obtenerCursoPorId($idCurso)
+    {
+        $query = "
+        SELECT 
+            Cursos.*, 
+            Usuarios.nombre AS nombre_creador, 
+            Categorias.nombre_categoria AS nombre_categoria 
+        FROM Cursos
+        JOIN Usuarios ON Cursos.id_instructor = Usuarios.idUsuario
+        JOIN Categorias ON Cursos.id_categoria = Categorias.id_categoria
+        WHERE Cursos.id_curso = :idCurso
+    ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerNivelesPorCurso($idCurso)
+    {
+        $query = "SELECT * FROM Niveles WHERE id_curso = :idCurso ORDER BY numero_nivel";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

@@ -65,11 +65,21 @@ class CursoController
             $this->cursoModel->actualizarEstadoCurso($idCurso, $nuevoEstado);
         }
     }
+
+    public function obtenerCursoPorId($idCurso)
+    {
+        return $this->cursoModel->obtenerCursoPorId($idCurso);
+    }
+
+    public function obtenerNivelesPorCurso($idCurso)
+    {
+        return $this->cursoModel->obtenerNivelesPorCurso($idCurso);
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $controlador = new CursoController();
-    
+
     if (isset($_POST['action']) && $_POST['action'] === 'agregarCurso') {
         $controlador->agregarCurso();
     } elseif (isset($_POST['action']) && $_POST['action'] === 'cambiarEstadoCurso') {

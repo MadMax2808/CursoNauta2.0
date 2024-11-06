@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const topicButtons = document.querySelectorAll('.topic-btn');
     const subtopicsLists = document.querySelectorAll('.subtopics-list');
 
+    // Alternar la visibilidad de la lista de subtemas
     topicButtons.forEach(button => {
         button.addEventListener('click', function() {
             const subtopicsList = this.nextElementSibling;
@@ -17,32 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Cargar el video seleccionado en el reproductor de la izquierda
     const subtopicLinks = document.querySelectorAll('.subtopic-link');
     const video = document.getElementById('course-video');
 
     subtopicLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
-            video.src = this.getAttribute('href');
-            video.load();
-            video.play();
-            this.previousElementSibling.checked = true; // Marca la casilla de verificación
+            e.preventDefault(); // Evita la navegación
+            video.src = this.getAttribute('href'); // Actualiza la fuente del video
+            video.load(); // Carga el nuevo video
+            video.play(); // Reproduce el video automáticamente
+            this.previousElementSibling.checked = true; // Marca la casilla de verificación del subtema
         });
     });
 });
 
-document.querySelector('.resource-header').addEventListener('click', function() {
-const content = document.querySelector('.resource-content');
-const icon = document.querySelector('.toggle-icon');
-
-if (content.style.display === 'block') {
-    content.style.display = 'none';
-    icon.style.transform = 'rotate(0deg)';
-} else {
-    content.style.display = 'block';
-    icon.style.transform = 'rotate(90deg)';
-}
-});
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -67,3 +57,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
+
+document.querySelector('.resource-header').addEventListener('click', function() {
+    const content = document.querySelector('.resource-content');
+    const icon = document.querySelector('.toggle-icon');
+    
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+    } else {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(90deg)';
+    }
+    });
+    
