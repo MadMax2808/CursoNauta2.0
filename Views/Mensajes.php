@@ -1,63 +1,53 @@
-<?php include 'Views\Parciales\Head.php'; ?>
+<?php
+include 'Views/Parciales/Head.php';
+include 'Views/Parciales/Nav.php';
+include 'Controllers\MensajesController.php';
+?>
 
 <link rel="stylesheet" href="Views/css/SMensajes.css">
 
-<?php include 'Views\Parciales\Nav.php'; ?>
-
-
 <div class="container">
+    <!-- Sidebar para los instructores -->
     <aside class="sidebar">
         <h2>Instructores</h2>
         <ul>
-            <li>
-                <img src="Views/Recursos/Perfil2.jpg" alt="Instructor 1" class="instructor-img">
-                <span>Ana Gómez</span>
-            </li>
-            <li>
-                <img src="Views/Recursos/Perfil3.jpg" alt="Instructor 2" class="instructor-img">
-                <span>Lizbeth </span>
-            </li>
-
+            <?php foreach ($instructores as $instructor): ?>
+                <li>
+                    <a href="index.php?page=Mensajes&user_id=<?= $instructor['idUsuario'] ?>">
+                        <img src="<?= htmlspecialchars($instructor['foto_avatar']) ?>" alt="<?= htmlspecialchars($instructor['nombre']) ?>" class="instructor-img">
+                        <span><?= htmlspecialchars($instructor['nombre']) ?></span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
         </ul>
     </aside>
+
+    <!-- Contenedor principal de chat -->
     <main class="main-content">
         <section class="messages">
             <h2>Mensajes Privados</h2>
 
             <div class="message-container">
-
-                <div class="message">
-                    <img src="Views/Recursos/Perfil.jpg" alt="Usuario 1" class="user-img">
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="user-name2">Celes</span>
-                            <span class="message-time">2024-09-15 14:30</span>
+                <?php foreach ($mensajes as $mensaje): ?>
+                    <div class="message <?= $mensaje['id_emisor'] == $id_emisor ? '' : 'instructor' ?>">
+                        <img src="<?= htmlspecialchars($mensaje['foto_avatar']) ?>" alt="<?= htmlspecialchars($mensaje['nombre']) ?>" class="user-img">
+                        <div class="message-content">
+                            <p class="message-text"><?= htmlspecialchars($mensaje['mensaje']) ?></p>
                         </div>
-                        <p class="message-text">Hola, ¿podrías ayudarme con la tarea 2 del curso?</p>
                     </div>
-                </div>
-
-                <div class="message instructor">
-                    <img src="Views/Recursos/Perfil2.jpg" alt="Instructor" class="user-img">
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="user-name">Instructora Ana</span>
-                            <span class="message-time">2024-09-15 15:00</span>
-                        </div>
-                        <p class="message-text">¡Claro!</p>
-                    </div>
-                </div>
-
+                <?php endforeach; ?>
             </div>
 
+
+            <!-- Formulario para enviar mensajes -->
             <div class="message-form">
-                <textarea placeholder="Escribe tu mensaje..."></textarea>
-                <button class="btn">Enviar</button>
+                <form action="index.php?page=Mensajes&user_id=<?= $id_receptor ?>" method="POST">
+                    <textarea name="mensaje" placeholder="Escribe tu mensaje..."></textarea>
+                    <button type="submit" class="btn">Enviar</button>
+                </form>
             </div>
-
-
         </section>
     </main>
 </div>
 
-<?php include 'Views\Parciales\Footer.php'; ?>
+<?php include 'Views/Parciales/Footer.php'; ?>

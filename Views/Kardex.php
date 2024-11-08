@@ -1,13 +1,16 @@
-<?php include 'Views\Parciales\Head.php'; ?>
+<?php
+require_once 'Controllers/InscripcionController.php';
+include 'Views/Parciales/Head.php';
+include 'Views/Parciales/Nav.php';
+
+$inscripcionController = new InscripcionController();
+$cursos = $inscripcionController->mostrarCursosInscritos(); // Llama al método para obtener los cursos
+?>
 
 <link rel="stylesheet" href="Views/css/SKardex.css">
 
-<?php include 'Views\Parciales\Nav.php'; ?>
-
-<!-- Cursos y Filtros -->
 <div class="container">
     <div class="kardex-section">
-        <!-- Filtros -->
         <div class="filters">
             <h3>Filtrar cursos</h3>
 
@@ -44,7 +47,7 @@
             <button class="apply-filters">Aplicar filtros</button>
         </div>
 
-        <!-- Cursos Kardex -->
+
         <div class="courses-kardex">
             <h2>Kardex</h2>
             <table class="courses-table">
@@ -60,56 +63,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Curso de Diseño Web</td>
-                        <td>15/01/2024</td>
-                        <td>10/09/2024</td>
-                        <td>75%</td>
-                        <td>N/A</td>
-                        <td>Desarrollo Web</td>
-                        <td class="status incomplete">Incompleto</td>
-                    </tr>
-                    <tr>
-                        <td>Curso de Programación en Python</td>
-                        <td>05/02/2024</td>
-                        <td>15/09/2024</td>
-                        <td>100%</td>
-                        <td>15/09/2024</td>
-                        <td>Programación</td>
-                        <td class="status completed">Completo</td>
-                    </tr>
-                    <tr>
-                        <td>Curso de Marketing Digital</td>
-                        <td>10/03/2024</td>
-                        <td>12/09/2024</td>
-                        <td>50%</td>
-                        <td>N/A</td>
-                        <td>Marketing</td>
-                        <td class="status incomplete">Incompleto</td>
-                    </tr>
-                    <tr>
-                        <td>Curso de Fotografía Profesional</td>
-                        <td>20/04/2024</td>
-                        <td>14/09/2024</td>
-                        <td>90%</td>
-                        <td>N/A</td>
-                        <td>Diseño</td>
-                        <td class="status incomplete">Incompleto</td>
-                    </tr>
-                    <tr>
-                        <td>Curso de Desarrollo en JavaScript</td>
-                        <td>15/05/2024</td>
-                        <td>16/09/2024</td>
-                        <td>100%</td>
-                        <td>16/09/2024</td>
-                        <td>Desarrollo Web</td>
-                        <td class="status completed">Completo</td>
-                    </tr>
+                    <?php foreach ($cursos as $curso): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($curso['curso_titulo']); ?></td>
+                            <td><?php echo htmlspecialchars($curso['fecha_inscripcion']); ?></td>
+                            <td><?php echo htmlspecialchars($curso['fecha_ultimo_acceso']); ?></td>
+                            <td><?php echo htmlspecialchars($curso['progreso']) . '%'; ?></td>
+                            <td><?php echo htmlspecialchars($curso['fecha_terminacion'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($curso['categoria']); ?></td>
+                            <td class="status <?php echo $curso['estado'] === 'completado' ? 'completed' : 'incomplete'; ?>">
+                                <?php echo htmlspecialchars($curso['estado']); ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
-<?php include 'Views\Parciales\Footer.php'; ?>
+<?php include 'Views/Parciales/Footer.php'; ?>
+w

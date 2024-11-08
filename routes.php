@@ -21,5 +21,6 @@ return [
     'CC'=> 'Controllers/CategoriaController.php',
     'UC'=> 'Controllers/UsuarioController.php',
     'CurC'=> 'Controllers/CursoController.php',
+    'IC'=> 'Controllers\InscripcionController.php',
     
 ];

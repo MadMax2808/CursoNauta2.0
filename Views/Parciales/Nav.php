@@ -79,6 +79,7 @@
                     <li><a href="index.php?page=Kardex">Kardex</a></li>
 
                 <?php elseif ($_SESSION['user_role'] == '2'): ?>
+                    <li><a href="index.php?page=Mensajes">Mis Mensajes</a></li>
                     <li><a href="index.php?page=Ventas">Mis Ventas</a></li>
                 <?php elseif ($_SESSION['user_role'] == '1'): ?>
 

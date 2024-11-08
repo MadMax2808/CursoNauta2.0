@@ -23,8 +23,8 @@ $userId = $_SESSION['user_id'];
     <form id="profile-form" action="" method="POST" enctype="multipart/form-data">
         <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
 
-        <label for="rol">Rol</label>
-        <select id="rol" name="rol" disabled>
+        <label for="rol" hidden>Rol</label>
+        <select id="rol" name="rol" hidden>
             <option value="3">Estudiante</option>
             <option value="2">Instructor</option>
         </select>

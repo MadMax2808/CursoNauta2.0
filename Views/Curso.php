@@ -1,12 +1,13 @@
 <?php include 'Views\Parciales\Head.php'; ?>
 <link rel="stylesheet" href="Views/css/SCurso.css">
+
 <?php include 'Views\Parciales\Nav.php'; ?>
 
 <?php
 require_once 'Controllers/CursoController.php';
 
 $cursoController = new CursoController();
-$idCurso = 25;
+$idCurso = 26;
 
 if ($idCurso > 0) {
     $curso = $cursoController->obtenerCursoPorId($idCurso);
@@ -23,6 +24,9 @@ if ($idCurso > 0) {
         <h1 class="course-title"><?php echo htmlspecialchars($curso['titulo']); ?></h1>
         <p class="course-category">Categoría: <?php echo htmlspecialchars($curso['nombre_categoria']); ?></p>
         <p class="course-category"><strong>Creador:</strong> <?php echo htmlspecialchars($curso['nombre_creador']); ?></p>
+        <a href="index.php?page=Mensajes&user_id=<?php echo $curso['id_instructor']; ?>" title="Enviar mensaje al creador" style="margin-left: 5px; font-size: 1.5em;">
+            📧
+        </a>
     </div>
 
     <div class="course-description">
@@ -169,10 +173,10 @@ if ($idCurso > 0) {
     <div class="course-purchase">
         <h2>Adquiere este curso</h2>
         <p class="course-price"><strong>$<?php echo htmlspecialchars($curso['costo']); ?></strong></p>
-        <a href="index.php?page=Pago" class="purchase-btn">Comprar Curso</a>
+        <a href="index.php?page=Pago&idCurso=<?php echo $idCurso; ?>" class="purchase-btn">Comprar Curso</a>
     </div>
 
 </div>
 
 <script src="Views\js\JCurso.js"> </script>
-<?php include 'Views\Parciales\Footer.php'; ?>
+<?php include 'Views\Parciales\Footer.php'; ?>w
