@@ -4,9 +4,11 @@ function processPurchase(courseId, price) {
         alert('Por favor seleccione un método de pago');
         return;
     }
-    
-    // Aquí puedes agregar la lógica para procesar el pago directamente
-    // Por ejemplo, redirigir a la página de pago correspondiente
-    alert('Redirigiendo al proceso de pago...');
-    // window.location.href = `proceso-pago.php?curso=${courseId}&metodo=${paymentMethod}&precio=${price}`;
+
+    // Asignar el método de pago al campo oculto
+    document.getElementById('forma_pago').value = paymentMethod;
+    document.getElementById('precio_pagado').value = price;
+
+    // Enviar el formulario
+    document.getElementById('purchaseForm').submit();
 }

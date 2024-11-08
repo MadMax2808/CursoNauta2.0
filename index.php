@@ -2,6 +2,8 @@
 
 include_once 'Models\Database.php';
 
+require_once 'init.php';
+
 $database = new Database();
 $db = $database->getConnection();
 

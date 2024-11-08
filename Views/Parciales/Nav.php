@@ -32,10 +32,10 @@
     </nav>
 
     <div class="user-profile" id="user-profile">
-        <?php
+        <!-- <?php
         session_start();
         // Obtener el id_rol almacenado en la sesión
-        ?>
+        ?> -->
         <?php if (!isset($_SESSION['user_id'])): ?>
             <!-- Si no ha iniciado sesión, muestra "Iniciar Sesión" -->
             <a href="index.php?page=Login" class="btn-login">Iniciar Sesión</a>

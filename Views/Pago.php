@@ -1,3 +1,4 @@
+
 <?php include 'Views/Parciales/Head.php'; ?>
 <link rel="stylesheet" href="Views/css/SPago.css">
 
@@ -16,6 +17,8 @@ if ($idCurso > 0) {
     exit;
 }
 ?>
+
+// Código de la página aquí...
 
 <div class="container">
     <div class="course-details">
@@ -40,10 +43,15 @@ if ($idCurso > 0) {
                     </select>
                 </div>
 
-                <form action="index.php?page=IC" method="POST">
+                <form action="index.php?page=IC" method="POST" id="purchaseForm">
                     <input type="hidden" name="idCurso" value="<?php echo $idCurso; ?>">
                     <input type="hidden" name="action" value="registrarInscripcion">
-                    <button type="submit" class="purchase-btn">Comprar Ahora</button>
+                    <input type="hidden" name="forma_pago" id="forma_pago">
+                    <input type="hidden" name="precio_pagado" id="precio_pagado">
+
+                    <button type="button" class="purchase-btn" onclick="processPurchase(<?php echo $idCurso; ?>, <?php echo $curso['costo']; ?>)">
+                        Comprar Ahora
+                    </button>
                 </form>
 
             </div>

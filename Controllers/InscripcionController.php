@@ -10,27 +10,42 @@ class InscripcionController
         $this->inscripcionModel = new InscripcionModel();
     }
 
-    public function registrar()
-    {
-        session_start();
+    public function registrar() {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+    
         $idCurso = isset($_POST['idCurso']) ? (int)$_POST['idCurso'] : 0;
-        $idUsuario = $_SESSION['user_id'];
-
-        if ($idCurso > 0 && $idUsuario) {
-            $resultado = $this->inscripcionModel->registrarInscripcion($idCurso, $idUsuario);
-            if ($resultado) {
-                echo "<script>
-                alert('¡Se Agrego Tu Curso Al Kardex!');
-                window.location.href = 'index.php?page=Kardex'; // Redirige a una página de confirmación o a donde desees
-              </script>";
+        $idUsuario = $_SESSION['user_id'] ?? null;
+        $formaPago = $_POST['forma_pago'] ?? '';
+        $precioPagado = $_POST['precio_pagado'] ?? 0;
+    
+        // Verificar si el curso ya está inscrito
+        if ($this->inscripcionModel->inscripcionYaRegistrada($idCurso, $idUsuario)) {
+            echo "<script>alert('Ya estás inscrito en este curso.'); window.location.href = 'index.php?page=Principal';</script>";
+            return; // Detener el proceso si el curso ya está inscrito
+        }
+    
+        if ($idCurso > 0 && $idUsuario && $formaPago && $precioPagado > 0) {
+            $inscripcionExitosa = $this->inscripcionModel->registrarInscripcion($idCurso, $idUsuario);
+    
+            if ($inscripcionExitosa) {
+                // Registrar la venta después de la inscripción
+                $ventaExitosa = $this->inscripcionModel->registrarVenta($idCurso, $idUsuario, $precioPagado, $formaPago);
+                
+                if ($ventaExitosa) {
+                    echo "<script>alert('¡Inscripción y venta registradas con éxito!'); window.location.href = 'index.php?page=Kardex';</script>";
+                } else {
+                    echo "<script>alert('Error al registrar la venta.');</script>";
+                }
             } else {
-                echo "Error al registrar la inscripción.";
+                echo "<script>alert('Error al registrar la inscripción.');</script>";
             }
         } else {
-            echo "Datos de inscripción inválidos.";
+            echo "<script>alert('Datos de inscripción o venta inválidos.');</script>";
         }
+   
     }
-
     public function mostrarCursosInscritos()
     {
         $idUsuario = $_SESSION['user_id'];
