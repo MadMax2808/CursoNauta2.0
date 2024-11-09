@@ -1,9 +1,6 @@
 <?php
-class AuthMiddleware
-{
-    public static function checkAuthentication($requiredRole = null)
-    {
-
+class AuthMiddleware {
+    public static function checkAuthentication($requiredRoles = []) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -17,12 +14,12 @@ class AuthMiddleware
             exit();
         }
 
-        // Verificar el rol del usuario, si se requiere un rol específico
-        if ($requiredRole && (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== $requiredRole)) {
+        // Verificar si el rol del usuario está en los roles permitidos
+        if (!empty($requiredRoles) && (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $requiredRoles))) {
             echo "<script>
-            alert('No tienes acceso a esta página.');
-            window.location.href = 'index.php?page=Principal';
-          </script>";
+                    alert('No tienes acceso a esta página.');
+                    window.location.href = 'index.php?page=Principal';
+                  </script>";
             exit();
         }
     }

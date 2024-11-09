@@ -137,6 +137,12 @@ body {
     text-align: center;
     font-size: 0.9rem;
 }
+.status a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
 
 .status.completed {
     background-color: #4caf50;

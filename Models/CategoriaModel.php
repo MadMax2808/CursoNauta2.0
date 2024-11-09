@@ -35,6 +35,5 @@ class CategoriaModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-
 }
 

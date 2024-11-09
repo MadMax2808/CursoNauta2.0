@@ -51,6 +51,10 @@ class InscripcionController
         $idUsuario = $_SESSION['user_id'];
         return $this->inscripcionModel->obtenerCursosInscritos($idUsuario); // Asegúrate de devolver el resultado
     }
+    
+    public function generarCertificado($id_curso, $id_usuario) {
+        return $this->inscripcionModel->obtenerDatosCertificado($id_curso, $id_usuario);
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

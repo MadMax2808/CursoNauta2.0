@@ -12,6 +12,8 @@ $idCurso = 26;
 if ($idCurso > 0) {
     $curso = $cursoController->obtenerCursoPorId($idCurso);
     $niveles = $cursoController->obtenerNivelesPorCurso($idCurso);
+    $valoracionPromedio = $cursoController->obtenerValoracionPromedio($idCurso);
+    $comentarios = $cursoController->obtenerComentarios($idCurso);
 } else {
     echo "Curso no encontrado.";
     exit;
@@ -130,44 +132,43 @@ if ($idCurso > 0) {
         <div class="feedback-section">
             <h2>Valoraciones</h2>
             <div class="ratings">
-                <span class="rating">⭐⭐⭐⭐☆</span> <!-- 4 estrellas de 5 -->
-                <span>(20 valoraciones)</span>
+                <span class="rating">
+                    <?php
+                    $estrellas = round($valoracionPromedio);
+                    echo str_repeat('⭐', $estrellas) . str_repeat('☆', 5 - $estrellas);
+                    ?>
+                </span>
+                <span>(<?php echo count($comentarios); ?> valoraciones)</span>
             </div>
-
 
             <div class="comments">
                 <h2>Comentarios</h2>
-
-                <div class="comment">
-                    <div class="user-info">
-                        <img src="Recursos/Icon.png" alt="Foto del Usuario" class="comment-user-img">
-                        <div>
-                            <p class="comment-username"> MikeWas</p>
-                            <p class="comment-date">12/09/2024, 14:30</p>
+                <?php foreach ($comentarios as $comentario): ?>
+                    <div class="comment">
+                        <div class="user-info">
+                            <img src="<?php echo htmlspecialchars($comentario['foto_avatar'] ?: 'Recursos/Icon.png'); ?>"
+                                alt="Foto del Usuario" class="comment-user-img">
+                            <div>
+                                <p class="comment-username"><?php echo htmlspecialchars($comentario['nombre_usuario']); ?></p>
+                                <p class="comment-date"><?php echo htmlspecialchars(date('d/m/Y, H:i', strtotime($comentario['fecha_comentario']))); ?></p>
+                            </div>
                         </div>
+
+                        <!-- Mostrar comentario o mensaje de eliminado -->
+                        <?php if ($comentario['eliminado']): ?>
+                            <p class="comment-text"><em>(Este comentario ha sido eliminado por el administrador)</em></p>
+                        <?php else: ?>
+                            <p class="comment-text"><?php echo htmlspecialchars($comentario['comentario']); ?></p>
+                        <?php endif; ?>
+
+                        <!-- Botón de Eliminar para administradores -->
+                        <?php if ($_SESSION['user_role'] == 1 && !$comentario['eliminado']): ?>
+                            <button class="delete-btn">Eliminar</button>
+                        <?php endif; ?>
                     </div>
-                    <p class="comment-text">Buen Curso, tiene lo necesario para empezar a entrar al mundo del diseño
-                        web, aunque me gustaria que fuera mas largo</p>
-                    <button class="delete-btn">Eliminar</button>
-                </div>
-
-                <div class="comment">
-                    <div class="user-info">
-                        <img src="Recursos/Icon.png" alt="Foto del Usuario" class="comment-user-img">
-                        <div>
-                            <p class="comment-username"> MikeWas'Nt</p>
-                            <p class="comment-date">05/07/2024, 17:30</p>
-                        </div>
-                    </div>
-                    <p class="comment-text">Que feo curso</p>
-                    <button class="delete-btn">Eliminar</button>
-                </div>
-
-
+                <?php endforeach; ?>
             </div>
-
         </div>
-
     </div>
 
     <div class="course-purchase">

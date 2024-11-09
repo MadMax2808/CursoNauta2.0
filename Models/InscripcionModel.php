@@ -73,5 +73,26 @@ class InscripcionModel
             return false;
         }
     }
+
+    public function obtenerDatosCertificado($id_curso, $id_usuario) {
+        $query = "SELECT 
+                    u.nombre AS nombre_estudiante,
+                    c.titulo AS nombre_curso,
+                    i.fecha_terminacion,
+                    instructor.nombre AS nombre_instructor
+                  FROM Inscripciones i
+                  JOIN Usuarios u ON i.id_usuario = u.idUsuario
+                  JOIN Cursos c ON i.id_curso = c.id_curso
+                  JOIN Usuarios instructor ON c.id_instructor = instructor.idUsuario
+                  WHERE i.id_curso = :id_curso AND i.id_usuario = :id_usuario AND i.completado = 1";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_curso', $id_curso);
+        $stmt->bindParam(':id_usuario', $id_usuario);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     
 }

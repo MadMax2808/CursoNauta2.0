@@ -75,6 +75,15 @@ class CursoController
     {
         return $this->cursoModel->obtenerNivelesPorCurso($idCurso);
     }
+    public function obtenerValoracionPromedio($idCurso)
+    {
+        return $this->cursoModel->obtenerValoracionPromedio($idCurso);
+    }
+    
+    public function obtenerComentarios($idCurso)
+    {
+        return $this->cursoModel->obtenerComentarios($idCurso);
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

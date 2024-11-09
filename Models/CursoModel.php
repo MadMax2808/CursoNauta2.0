@@ -96,4 +96,25 @@ class CursoModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function obtenerValoracionPromedio($idCurso)
+    {
+        $stmt = $this->conn->prepare("SELECT obtenerPromedioCurso(?) AS promedio");
+        $stmt->execute([$idCurso]);
+        $result = $stmt->fetch();
+        return $result['promedio'] ?? 0;
+    }
+
+    public function obtenerComentarios($idCurso) {
+        $stmt = $this->conn->prepare("
+            SELECT c.comentario, c.calificacion, c.fecha_comentario, c.id_usuario, c.eliminado,
+                   u.nombre AS nombre_usuario, u.foto_avatar 
+            FROM Comentarios AS c
+            JOIN Usuarios AS u ON c.id_usuario = u.idUsuario
+            WHERE c.id_curso = ?
+            ORDER BY c.fecha_comentario DESC
+        ");
+        $stmt->execute([$idCurso]);
+        return $stmt->fetchAll();
+    }
 }

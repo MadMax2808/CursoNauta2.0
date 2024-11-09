@@ -72,7 +72,11 @@ $cursos = $inscripcionController->mostrarCursosInscritos(); // Llama al método 
                             <td><?php echo htmlspecialchars($curso['fecha_terminacion'] ?? 'N/A'); ?></td>
                             <td><?php echo htmlspecialchars($curso['categoria']); ?></td>
                             <td class="status <?php echo $curso['estado'] === 'completado' ? 'completed' : 'incomplete'; ?>">
-                                <?php echo htmlspecialchars($curso['estado']); ?>
+                                <?php if ($curso['estado'] === 'completado'): ?>
+                                    <a href="index.php?page=Fin&id_curso=<?php echo $curso['id_curso']; ?>" class="btn-certificado">Completado</a>
+                                <?php else: ?>
+                                    <?php echo htmlspecialchars($curso['estado']); ?>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -83,4 +87,3 @@ $cursos = $inscripcionController->mostrarCursosInscritos(); // Llama al método 
 </div>
 
 <?php include 'Views/Parciales/Footer.php'; ?>
-w
