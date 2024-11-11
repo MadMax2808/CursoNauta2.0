@@ -48,7 +48,6 @@ class NavController {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
 
     // Obtener todos los cursos activos
     public function getCursosActivos() {

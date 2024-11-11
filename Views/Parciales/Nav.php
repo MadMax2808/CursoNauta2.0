@@ -12,13 +12,15 @@ $categoriasActivas = $navController->getCategoriasActivas();
 
    <!-- Barra de búsqueda -->
    <div class="search-bar">
-        <form action="index.php?page=All" method="POST">
-            <input type="text" name="search" placeholder="Buscar cursos...">
-            <button type="submit" class="search-button" id="search-btn">
-                <span class="material-icons">search</span>
-            </button>
-        </form>
-    </div>
+    <form action="index.php" method="GET">
+        <input type="hidden" name="page" value="All">
+        <input type="text" name="search" placeholder="Buscar cursos...">
+        <button type="submit" class="search-button" id="search-btn">
+            <span class="material-icons">search</span>
+        </button>
+    </form>
+</div>
+
 
     <nav>
         <ul>

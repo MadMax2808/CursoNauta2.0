@@ -93,6 +93,4 @@ function renderStars($rating)
     </div>
 </section>
 
-
-
 <?php include 'Views\Parciales\Footer.php'; ?>
