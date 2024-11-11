@@ -31,6 +31,8 @@ CREATE TABLE Categorias (
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_creador) REFERENCES Usuarios(idUsuario)
 );
+ALTER TABLE Categorias
+ADD COLUMN activo BOOLEAN DEFAULT TRUE;
 
 CREATE TABLE Cursos (
     id_curso INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,6 +48,9 @@ CREATE TABLE Cursos (
     FOREIGN KEY (id_instructor) REFERENCES Usuarios(idUsuario),
     FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria)
 );
+ALTER TABLE Cursos
+ADD fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP;
+
 
 CREATE TABLE Niveles (
     id_nivel INT AUTO_INCREMENT PRIMARY KEY,

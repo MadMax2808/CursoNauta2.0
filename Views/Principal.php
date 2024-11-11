@@ -1,96 +1,98 @@
-<?php include 'Views\Parciales\Head.php'; ?> 
+<?php
+include 'Views\Parciales\Head.php';
+include_once 'Controllers\VistasController.php';
 
- <link rel="stylesheet" href="Views/css/SPrincipal.css">
- 
-<?php include 'Views\Parciales\Nav.php'; ?> 
+$controller = new VistasController();
 
-    <!-- Presentación -->
+$cursosMasVendidos = $controller->getCursosMasVendidos();
+$cursosRecientes = $controller->getCursosRecientes();
+$cursosMejorCalificados = $controller->getCursosMejorCalificados();
+
+function renderStars($rating)
+{
+    $stars = '';
+    for ($i = 1; $i <= 5; $i++) {
+        if ($rating >= $i) {
+            $stars .= '⭐';
+        } elseif ($rating >= $i - 0.5) {
+            $stars .= '⭐️';
+        } else {
+            $stars .= '☆';
+        }
+    }
+    return $stars;
+}
+?>
+
+<link rel="stylesheet" href="Views/css/SPrincipal.css">
+
+<?php include 'Views\Parciales\Nav.php'; ?>
+
+<!-- Presentación -->
 <section id="inicio" class="hero">
-        <h2>Explora y Mejora tus Habilidades Creativas</h2>
-        <p>Únete a una comunidad que aprende y comparte conocimientos creativos.</p>
-        <a href="index.php?page=All" class="btn">Explorar Cursos</a>
+    <h2>Explora y Mejora tus Habilidades Creativas</h2>
+    <p>Únete a una comunidad que aprende y comparte conocimientos creativos.</p>
+    <a href="index.php?page=All" class="btn">Explorar Cursos</a>
 </section>
 
-  <!-- Cursos -->
+<!-- Cursos Más Vendidos -->
 <section class="courses-carousel">
-        <h2>Cursos Destacados</h2>
-
-        <!-- Flecha izquierda -->
-        <button class="carousel-arrow left-arrow">&#9664;</button>
-
-        <!-- Contenedor de los cursos -->
-        <div class="course-grid">
-            <a href="index.php?page=Curso">
-            <div class="course-card">
-                <img src="Views\Recursos\C1.jpg" Imagen del Curso" class="course-img">
-             
-                <h3 >Curso de Diseño Gráfico</h3>
-            
-                <span class="course-category">Diseño</span>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p>Niveles: 3</p>
-                <p>Costo: $40</p>
-                <p>Aprende los fundamentos del diseño gráfico para crear proyectos impresionantes.</p>
-            </div>
-           </a>  
-
-            <div class="course-card">
-                <img src="Views\Recursos\C2.jpg" alt="Imagen del Curso" class="course-img">
-                <h3>Curso de Ilustración Digital</h3>
-                <span class="course-category">Ilustración</span>
-                <div class="stars">⭐⭐⭐⭐☆</div>
-                <p>Niveles: 5</p>
-                <p>Costo: $50</p>
-                <p>Domina las técnicas de ilustración digital usando herramientas avanzadas.</p>
-            </div>
-
-
-            <div class="course-card">
-                <img src="Views\Recursos\C3.jpg" alt="Imagen del Curso" class="course-img">
-                <h3>Curso de Animación 3D</h3>
-                <span class="course-category">Animación</span>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p>Niveles: 7</p>
-                <p>Costo: $80</p>
-                <p>Explora la animación en 3D y lleva tus ideas al siguiente nivel con software profesional.</p>
-            </div>
-
-
-            <div class="course-card">
-                <img src="Views\Recursos\C4.png" alt="Imagen del Curso" class="course-img">
-                <h3>Curso de Fotografía</h3>
-                <span class="course-category">Fotografía</span>
-                <div class="stars">⭐⭐⭐⭐☆</div>
-                <p>Niveles: 4</p>
-                <p>Costo: $35</p>
-                <p>Aprende los fundamentos de la fotografía para capturar imágenes impactantes.</p>
-            </div>
-
-
-            <div class="course-card">
-                <img src="Views\Recursos\C5.jpeg" alt="Imagen del Curso" class="course-img">
-                <h3>Curso de Desarrollo Web</h3>
-                <span class="course-category">Programación</span>
-                <div class="stars">⭐⭐⭐⭐⭐</div>
-                <p>Niveles: 6</p>
-                <p>Costo: $60</p>
-                <p>Domina el desarrollo web con HTML, CSS, JavaScript y más herramientas modernas.</p>
-            </div>
-
-
-            <div class="course-card">
-                <img src="Views\Recursos\C6.jpg" alt="Imagen del Curso" class="course-img">
-                <h3>Curso de Marketing Digital</h3>
-                <span class="course-category">Marketing</span>
-                <div class="stars">⭐⭐⭐⭐☆</div>
-                <p>Niveles: 5</p>
-                <p>Costo: $45</p>
-                <p>Descubre cómo crear y ejecutar campañas de marketing digital exitosas.</p>
-            </div>
-        </div>
-
-        <!-- Flecha derecha -->
-        <button class="carousel-arrow right-arrow">&#9654;</button>
+    <h2>Cursos Más Vendidos</h2>
+    <div class="course-grid">
+        <?php foreach ($cursosMasVendidos as $curso): ?>
+            <a href="index.php?page=Curso&idCurso=<?= $curso['id_curso'] ?>">
+                <div class="course-card">
+                    <img src="data:image/jpeg;base64,<?= base64_encode($curso['imagen']) ?>" alt="Imagen del Curso" class="course-img">
+                    <h3><?= htmlspecialchars($curso['titulo']) ?></h3>
+                    <span class="course-category"><?= htmlspecialchars($curso['nombre_categoria']) ?></span>
+                    <p><?= htmlspecialchars($curso['descripcion']) ?></p>
+                    <p><strong>Costo: $<?= number_format($curso['costo'], 2) ?></strong></p>
+                    <p>Total Ventas: <?= $curso['total_ventas'] ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    </div>
 </section>
 
-<?php include 'Views\Parciales\Footer.php'; ?> 
+<!-- Cursos Recientes -->
+<section class="courses-carousel">
+    <h2>Cursos Recientes</h2>
+    <div class="course-grid">
+        <?php foreach ($cursosRecientes as $curso): ?>
+            <a href="index.php?page=Curso&idCurso=<?= $curso['id_curso'] ?>">
+                <div class="course-card">
+                    <img src="data:image/jpeg;base64,<?= base64_encode($curso['imagen']) ?>" alt="Imagen del Curso" class="course-img">
+                    <h3><?= htmlspecialchars($curso['titulo']) ?></h3>
+                    <span class="course-category"><?= htmlspecialchars($curso['nombre_categoria']) ?></span>
+                    <p><?= htmlspecialchars($curso['descripcion']) ?></p>
+                    <p>Costo: $<?= number_format($curso['costo'], 2) ?></p>
+                    <p>Fecha de Creación: <?= $curso['fecha_creacion'] ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<!-- Cursos Mejor Calificados -->
+<section class="courses-carousel">
+    <h2>Cursos Mejor Calificados</h2>
+    <div class="course-grid">
+        <?php foreach ($cursosMejorCalificados as $curso): ?>
+            <a href="index.php?page=Curso&idCurso=<?= $curso['id_curso'] ?>">
+                <div class="course-card">
+                    <img src="data:image/jpeg;base64,<?= base64_encode($curso['imagen']) ?>" alt="Imagen del Curso" class="course-img">
+                    <h3><?= htmlspecialchars($curso['titulo']) ?></h3>
+                    <span class="course-category"><?= htmlspecialchars($curso['nombre_categoria']) ?></span>
+                    <div class="stars"><?= renderStars($curso['calificacion_promedio']) ?></div>
+                    <p><?= htmlspecialchars($curso['descripcion']) ?></p>
+                    <p><strong>Costo: $<?= number_format($curso['costo'], 2) ?></strong></p>
+                    <p>Calificación Promedio: <?= round($curso['calificacion_promedio'], 1) ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+
+
+<?php include 'Views\Parciales\Footer.php'; ?>

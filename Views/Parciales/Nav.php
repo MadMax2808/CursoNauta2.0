@@ -1,13 +1,19 @@
+<?php 
+include_once 'Controllers/NavController.php';
+$navController = new NavController();
+$categoriasActivas = $navController->getCategoriasActivas();
+?>
+
 <header>
     <div class="logo">
         <img src="Views/Recursos/Icon2.png" alt="Logo de CursoNauta" class="logo-img">
         <h1>CursoNauta</h1>
     </div>
 
-    <!-- Barra -->
-    <div class="search-bar">
+   <!-- Barra de búsqueda -->
+   <div class="search-bar">
         <form action="index.php?page=All" method="POST">
-            <input type="text" placeholder="Buscar cursos...">
+            <input type="text" name="search" placeholder="Buscar cursos...">
             <button type="submit" class="search-button" id="search-btn">
                 <span class="material-icons">search</span>
             </button>
@@ -20,14 +26,14 @@
             <li class="dropdown">
                 <a href="#" class="dropdown-btn">Categorías</a>
                 <ul class="dropdown-content">
-                    <li><a href="index.php?page=All">Diseño</a></li>
-                    <li><a href="index.php?page=All">Ilustración</a></li>
-                    <li><a href="index.php?page=All">Animación</a></li>
-                    <li><a href="index.php?page=All">Fotografía</a></li>
+                    <?php foreach ($categoriasActivas as $categoria): ?>
+                        <li><a href="index.php?page=All&categoria=<?= $categoria['id_categoria'] ?>">
+                            <?= htmlspecialchars($categoria['nombre_categoria']) ?>
+                        </a></li>
+                    <?php endforeach; ?>
                 </ul>
             </li>
             <li><a href="index.php?page=All">Cursos</a></li>
-
         </ul>
     </nav>
 

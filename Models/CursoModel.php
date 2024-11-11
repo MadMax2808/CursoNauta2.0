@@ -99,13 +99,22 @@ class CursoModel
 
     public function obtenerValoracionPromedio($idCurso)
     {
+        // Calcula el promedio usando la función almacenada
         $stmt = $this->conn->prepare("SELECT obtenerPromedioCurso(?) AS promedio");
         $stmt->execute([$idCurso]);
         $result = $stmt->fetch();
-        return $result['promedio'] ?? 0;
+        $promedio = $result['promedio'] ?? 0;
+
+        // Actualiza la columna calificacion_promedio en la tabla Cursos
+        $updateStmt = $this->conn->prepare("UPDATE Cursos SET calificacion_promedio = ? WHERE id_curso = ?");
+        $updateStmt->execute([$promedio, $idCurso]);
+
+        return $promedio;
     }
 
-    public function obtenerComentarios($idCurso) {
+
+    public function obtenerComentarios($idCurso)
+    {
         $stmt = $this->conn->prepare("
             SELECT c.comentario, c.calificacion, c.fecha_comentario, c.id_usuario, c.eliminado,
                    u.nombre AS nombre_usuario, u.foto_avatar 

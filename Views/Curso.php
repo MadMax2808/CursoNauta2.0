@@ -7,7 +7,7 @@
 require_once 'Controllers/CursoController.php';
 
 $cursoController = new CursoController();
-$idCurso = 26;
+$idCurso = isset($_GET['idCurso']) ? intval($_GET['idCurso']) : 0;
 
 if ($idCurso > 0) {
     $curso = $cursoController->obtenerCursoPorId($idCurso);

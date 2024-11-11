@@ -9,13 +9,11 @@ $routesWithAuthentication = [
     'Perfil' =>  null,          
     'Ventas' =>  [2],             
     'Admi' =>  [1],               
-    'AddCurso' =>  [1],           
+    'AddCurso' => [2],           
     'Kardex' =>  [3],             
     'Mensajes' => [2, 3],  
     'Pago' => [3],
     'Fin' => [3],
-    'AddCurso' => [1],
-
  
 ];
 

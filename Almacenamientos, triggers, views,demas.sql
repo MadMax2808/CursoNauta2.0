@@ -116,6 +116,176 @@ END //
 DELIMITER ;
 
 
+
+
+-- VIEWS --
+-- Cursos más vendidos ---
+CREATE OR REPLACE VIEW CursosMasVendidos AS
+SELECT c.id_curso, c.titulo, c.imagen, c.descripcion, c.costo, cat.nombre_categoria, COUNT(v.id_venta) AS total_ventas
+FROM cursos c
+JOIN ventas v ON c.id_curso = v.id_curso
+JOIN categorias cat ON c.id_categoria = cat.id_categoria
+WHERE c.activo = TRUE
+GROUP BY c.id_curso, c.titulo, c.imagen, c.descripcion, c.costo, cat.nombre_categoria
+ORDER BY total_ventas DESC;
+
+-- Cursos recientes ---
+CREATE OR REPLACE VIEW CursosRecientes AS
+SELECT c.id_curso, c.titulo, c.imagen, c.descripcion, c.costo, cat.nombre_categoria, cat.fecha_creacion
+FROM cursos c
+JOIN categorias cat ON c.id_categoria = cat.id_categoria
+WHERE c.activo = TRUE
+ORDER BY cat.fecha_creacion DESC
+LIMIT 10;
+
+-- Cursos mejor calificados ---
+CREATE OR REPLACE VIEW CursosMejorCalificados AS
+SELECT c.id_curso, c.titulo, c.imagen, c.descripcion, c.costo, cat.nombre_categoria, c.calificacion_promedio
+FROM cursos c
+JOIN categorias cat ON c.id_categoria = cat.id_categoria
+WHERE c.activo = TRUE
+ORDER BY c.calificacion_promedio DESC;
+
+
+
+-- Vista de cursos activos
+CREATE OR REPLACE VIEW CursosActivos AS
+SELECT 
+    c.id_curso,
+    c.titulo,
+    c.descripcion,
+    c.imagen,
+    c.costo,
+    c.niveles,
+    c.calificacion_promedio,
+    c.id_instructor,
+    c.id_categoria,
+    c.fecha_creacion,
+    i.nombre AS nombre_instructor,
+    cat.nombre_categoria
+FROM cursos c
+JOIN usuarios i ON c.id_instructor = i.idUsuario
+JOIN categorias cat ON c.id_categoria = cat.id_categoria
+WHERE c.activo = TRUE;
+
+
+-- Vista instructores --
+CREATE OR REPLACE VIEW InstructoresActivos AS
+SELECT 
+    idUsuario,
+    nombre,
+    foto_avatar,
+    correo
+FROM 
+    Usuarios
+WHERE 
+    id_rol = 2
+    AND activo = TRUE;
+
+
+
+-- Categorias activas
+-- Con Cursos activos
+CREATE VIEW CategoriasActivas AS
+SELECT DISTINCT cat.id_categoria, cat.nombre_categoria
+FROM categorias cat
+JOIN cursos c ON cat.id_categoria = c.id_categoria
+WHERE c.activo = TRUE;
+
+-- No cursos Activos--
+CREATE OR REPLACE VIEW CategoriasActivas AS
+SELECT id_categoria, nombre_categoria
+FROM Categorias
+WHERE activo = TRUE;
+
+
+-- BUSQUEDAS --
+DELIMITER //
+CREATE PROCEDURE BuscarCursosPorPalabraClave(IN palabraClave VARCHAR(255))
+BEGIN
+    SELECT c.id_curso, c.titulo, c.descripcion, c.imagen, c.costo, c.niveles, c.calificacion_promedio, 
+           cat.nombre_categoria, u.nombre AS nombre_instructor
+    FROM cursos c
+    JOIN categorias cat ON c.id_categoria = cat.id_categoria
+    JOIN usuarios u ON c.id_instructor = u.idUsuario
+    WHERE c.activo = TRUE
+      AND (c.titulo LIKE CONCAT('%', palabraClave, '%') 
+           OR c.descripcion LIKE CONCAT('%', palabraClave, '%'));
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE BuscarCursosPorCategoria(IN categoriaID INT)
+BEGIN
+    SELECT c.id_curso, c.titulo, c.descripcion, c.imagen, c.costo, c.niveles, c.calificacion_promedio, 
+           cat.nombre_categoria, u.nombre AS nombre_instructor
+    FROM cursos c
+    JOIN categorias cat ON c.id_categoria = cat.id_categoria
+    JOIN usuarios u ON c.id_instructor = u.idUsuario
+    WHERE c.activo = TRUE
+      AND c.id_categoria = categoriaID;
+END //
+
+
+DELIMITER //
+CREATE PROCEDURE BuscarCursosPorInstructor(IN instructorID INT)
+BEGIN
+    SELECT c.id_curso, c.titulo, c.descripcion, c.imagen, c.costo, c.niveles, c.calificacion_promedio, 
+           cat.nombre_categoria, u.nombre AS nombre_instructor
+    FROM cursos c
+    JOIN categorias cat ON c.id_categoria = cat.id_categoria
+    JOIN usuarios u ON c.id_instructor = u.idUsuario
+    WHERE c.activo = TRUE
+      AND c.id_instructor = instructorID;
+END //
+DELIMITER ;
+
+-- Procedimiento para buscar cursos por instructor
+DELIMITER //
+CREATE PROCEDURE BuscarCursosPorInstructor(IN instructorID INT)
+BEGIN
+    SELECT * FROM CursosActivos WHERE id_instructor = instructorID;
+END;
+DELIMITER ;
+
+-- Procedimiento para buscar cursos por rango de fechas
+DELIMITER //
+CREATE PROCEDURE BuscarCursosPorFecha(IN fechaInicio DATE, IN fechaFin DATE)
+BEGIN
+    SELECT * FROM CursosActivos WHERE fecha_creacion BETWEEN fechaInicio AND fechaFin;
+END;
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE BuscarCursosDinamico(
+    IN in_categoriaID INT,
+    IN in_instructorID INT,
+    IN in_fechaInicio DATE,
+    IN in_fechaFin DATE
+)
+BEGIN
+    SELECT * FROM CursosActivos
+    WHERE (in_categoriaID IS NULL OR id_categoria = in_categoriaID)
+      AND (in_instructorID IS NULL OR id_instructor = in_instructorID)
+      AND (in_fechaInicio IS NULL OR fecha_creacion >= in_fechaInicio)
+      AND (in_fechaFin IS NULL OR fecha_creacion <= in_fechaFin);
+END //
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- No Implementadas --
 -- triggers
 DELIMITER //
@@ -249,13 +419,6 @@ FROM categorias cat
 JOIN cursos c ON cat.id_categoria = c.id_categoria
 WHERE c.activo = TRUE;
 
--- vista de instructores
-CREATE VIEW Instructores AS
-SELECT u.idUsuario, u.nombre, u.correo
-FROM usuarios u
-JOIN roles r ON u.id_rol = r.id_rol
-WHERE r.rol_nombre = 'Instructor';
-
 -- Vista de reporte de usuario estudiante
 CREATE VIEW ReporteUsuarioEstudiante AS
 SELECT 
@@ -304,19 +467,6 @@ BEGIN
     SELECT id_curso, titulo, descripcion, costo
     FROM cursos
     WHERE id_categoria = p_idCategoria;
-END //
-DELIMITER ;
-
--- Procedimiento para filtrar cursos por rango de precios
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorRangoPrecio(
-    IN p_precio_min DECIMAL(10, 2),
-    IN p_precio_max DECIMAL(10, 2)
-)
-BEGIN
-    SELECT id_curso, titulo, descripcion, costo
-    FROM cursos
-    WHERE costo BETWEEN p_precio_min AND p_precio_max;
 END //
 DELIMITER ;
 
