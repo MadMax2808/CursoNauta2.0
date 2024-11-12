@@ -199,6 +199,56 @@ FROM Categorias
 WHERE activo = TRUE;
 
 
+-- Reportes
+CREATE VIEW ReporteInstructores AS
+SELECT 
+    u.idUsuario AS id_instructor,
+    u.nombre AS nombre_instructor,
+    u.fecha_registro AS fecha_ingreso,
+    COUNT(c.id_curso) AS cantidad_cursos_ofrecidos,
+    IFNULL(SUM(v.precio_pagado), 0) AS total_ganancias
+FROM 
+    Usuarios u
+LEFT JOIN 
+    Cursos c ON u.idUsuario = c.id_instructor
+LEFT JOIN 
+    Ventas v ON c.id_curso = v.id_curso
+WHERE 
+    u.id_rol = (SELECT id_rol FROM Roles WHERE rol_nombre = 'Instructor')
+GROUP BY 
+    u.idUsuario, u.nombre, u.fecha_registro;
+    
+
+CREATE VIEW ReporteEstudiantes AS
+SELECT 
+    u.idUsuario AS id_estudiante,
+    u.nombre AS nombre_estudiante,
+    u.fecha_registro AS fecha_ingreso,
+    COUNT(i.id_inscripcion) AS cantidad_cursos_inscritos,
+    CONCAT(
+        ROUND(
+            (SUM(CASE WHEN i.completado = TRUE THEN 1 ELSE 0 END) / COUNT(i.id_inscripcion)) * 100, 
+            2
+        ), 
+        '%'
+    ) AS porcentaje_cursos_terminados
+FROM 
+    Usuarios u
+LEFT JOIN 
+    Inscripciones i ON u.idUsuario = i.id_usuario
+WHERE 
+    u.id_rol = (SELECT id_rol FROM Roles WHERE rol_nombre = 'Estudiante')
+GROUP BY 
+    u.idUsuario, u.nombre, u.fecha_registro;
+
+
+
+
+
+
+
+
+
 -- BUSQUEDAS --
 DELIMITER //
 CREATE PROCEDURE BuscarCursosPorPalabraClave(IN palabraClave VARCHAR(255))
@@ -212,48 +262,6 @@ BEGIN
       AND (c.titulo LIKE CONCAT('%', palabraClave, '%') 
            OR c.descripcion LIKE CONCAT('%', palabraClave, '%'));
 END //
-DELIMITER ;
-
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorCategoria(IN categoriaID INT)
-BEGIN
-    SELECT c.id_curso, c.titulo, c.descripcion, c.imagen, c.costo, c.niveles, c.calificacion_promedio, 
-           cat.nombre_categoria, u.nombre AS nombre_instructor
-    FROM cursos c
-    JOIN categorias cat ON c.id_categoria = cat.id_categoria
-    JOIN usuarios u ON c.id_instructor = u.idUsuario
-    WHERE c.activo = TRUE
-      AND c.id_categoria = categoriaID;
-END //
-
-
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorInstructor(IN instructorID INT)
-BEGIN
-    SELECT c.id_curso, c.titulo, c.descripcion, c.imagen, c.costo, c.niveles, c.calificacion_promedio, 
-           cat.nombre_categoria, u.nombre AS nombre_instructor
-    FROM cursos c
-    JOIN categorias cat ON c.id_categoria = cat.id_categoria
-    JOIN usuarios u ON c.id_instructor = u.idUsuario
-    WHERE c.activo = TRUE
-      AND c.id_instructor = instructorID;
-END //
-DELIMITER ;
-
--- Procedimiento para buscar cursos por instructor
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorInstructor(IN instructorID INT)
-BEGIN
-    SELECT * FROM CursosActivos WHERE id_instructor = instructorID;
-END;
-DELIMITER ;
-
--- Procedimiento para buscar cursos por rango de fechas
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorFecha(IN fechaInicio DATE, IN fechaFin DATE)
-BEGIN
-    SELECT * FROM CursosActivos WHERE fecha_creacion BETWEEN fechaInicio AND fechaFin;
-END;
 DELIMITER ;
 
 DELIMITER //
@@ -378,96 +386,5 @@ END //
 
 DELIMITER ;
 
-
-
-
--- Views
--- cursos más vendidos
-CREATE VIEW CursosMasVendidos AS
-SELECT c.id_curso, c.titulo, COUNT(v.id_venta) AS total_ventas
-FROM cursos c
-JOIN ventas v ON c.id_curso = v.id_curso
-GROUP BY c.id_curso, c.titulo
-ORDER BY total_ventas DESC;
-
--- cursos recientes
-CREATE VIEW CursosRecientes AS
-SELECT c.id_curso, c.titulo, cat.fecha_creacion
-FROM cursos c
-JOIN categorias cat ON c.id_categoria = cat.id_categoria
-ORDER BY cat.fecha_creacion DESC
-LIMIT 10;
-
--- cursos mejor calificados
-CREATE VIEW CursosMejorCalificados AS
-SELECT c.id_curso, c.titulo, AVG(k.calificaciones) AS promedio_calificacion
-FROM cursos c
-JOIN kardex k ON c.id_curso = k.id_curso
-GROUP BY c.id_curso, c.titulo
-ORDER BY promedio_calificacion DESC;
-
--- vista de cursos activos
-CREATE VIEW CursosActivos AS
-SELECT id_curso, titulo, activo
-FROM cursos
-WHERE activo = TRUE;
-
--- vista de categorias activas
-CREATE VIEW CategoriasActivas AS
-SELECT DISTINCT cat.id_categoria, cat.nombre_categoria
-FROM categorias cat
-JOIN cursos c ON cat.id_categoria = c.id_categoria
-WHERE c.activo = TRUE;
-
--- Vista de reporte de usuario estudiante
-CREATE VIEW ReporteUsuarioEstudiante AS
-SELECT 
-    u.idUsuario,
-    u.nombre AS nombre_estudiante,
-    u.correo,
-    k.id_curso,
-    c.titulo AS titulo_curso,  -- Se trae el título del curso desde la tabla 'cursos'
-    k.progreso,
-    k.calificaciones,
-    k.fecha_inscripcion,
-    k.fecha_terminacion
-FROM kardex k
-JOIN usuarios u ON k.idUsuario = u.idUsuario
-JOIN cursos c ON k.id_curso = c.id_curso
-WHERE u.id_rol = 3; -- Asumiendo que el rol 3 es el de 'Estudiante'
-
--- Vista de reporte de usuario instructor
-CREATE VIEW ReporteUsuarioInstructor AS
-SELECT 
-    u.idUsuario,
-    u.nombre AS nombre_instructor,
-    u.correo,
-    COUNT(c.id_curso) AS cursos_creados  -- Cuenta la cantidad de cursos creados por cada instructor
-FROM usuarios u
-JOIN cursos c ON u.idUsuario = c.id_instructor  -- Relaciona la tabla usuarios con cursos a través del id_instructor
-WHERE u.id_rol = 2  -- Asumiendo que el rol 2 es el de 'Instructor'
-GROUP BY u.idUsuario, u.nombre, u.correo;
-
-
--- Funciones y procedimientos almacenados para filtros de búsqueda
--- Procedimiento para buscar cursos por título:
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorTitulo(IN p_titulo VARCHAR(255))
-BEGIN
-    SELECT id_curso, titulo, descripcion, costo
-    FROM cursos
-    WHERE titulo LIKE CONCAT('%', p_titulo, '%');
-END //
-DELIMITER ;
-
--- Procedimiento para buscar cursos por categoría:
-DELIMITER //
-CREATE PROCEDURE BuscarCursosPorCategoria(IN p_idCategoria INT)
-BEGIN
-    SELECT id_curso, titulo, descripcion, costo
-    FROM cursos
-    WHERE id_categoria = p_idCategoria;
-END //
-DELIMITER ;
 
 

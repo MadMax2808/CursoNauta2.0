@@ -66,39 +66,53 @@ function toggleCategoryForm(show) {
     form.style.display = show ? 'block' : 'none';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    showContent('usuarios');
-});
+function toggleEditCategoryForm(show) {
+    const form = document.getElementById('edit-category-form');
+    form.style.display = show ? 'block' : 'none';
+}
 
-document.getElementById('category-form').addEventListener('submit', function(event) {
-    const title = document.getElementById('category-title').value;
-    const description = document.getElementById('category-description').value;
+function editarCategoria(id, title, description) {
+    // Establece los valores en el formulario de edición
+    document.getElementById('edit-id_categoria').value = id;
+    document.getElementById('edit-category-title').value = title;
+    document.getElementById('edit-category-description').value = description;
 
-    let errorMessages = [];
-
-    // Validaciones solo si los campos no están vacíos
-    if (title.trim() === '') {
-        errorMessages.push('El título no puede estar vacío.');
-    }
-
-    if (description.trim() === '') {
-        errorMessages.push('La descripción no puede estar vacía.');
-    }
-
-    // Mostrar mensajes de error
-    if (errorMessages.length > 0) {
-        event.preventDefault(); 
-        errorMessages.forEach(function(message) {
-            alert(message);
-        });
-    }
-});
+    // Muestra el formulario de edición
+    toggleEditCategoryForm(true);
+}
 
 function confirmarAccion() {
     return confirm("¿Está seguro de que desea realizar esta acción?");
 }
 
+// Ocultar formularios cuando se cambia de sección
+document.addEventListener('DOMContentLoaded', () => {
+    showContent('usuarios');
+});
 
+
+//REPORTES
+function toggleReport(userType) {
+    document.getElementById('instructor-report').style.display = 'none';
+    document.getElementById('student-report').style.display = 'none';
+
+    if (userType === 'instructor') {
+        document.getElementById('instructor-report').style.display = 'block';
+    } else if (userType === 'estudiante') {
+        document.getElementById('student-report').style.display = 'block';
+    }
+}
+
+function generateReport() {
+    const userType = document.getElementById('user-type').value;
+    toggleReport(userType);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Oculta ambos reportes al cargar la página
+    document.getElementById('instructor-report').style.display = 'none';
+    document.getElementById('student-report').style.display = 'none';
+});
 
 
 

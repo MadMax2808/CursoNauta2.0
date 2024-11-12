@@ -1,4 +1,4 @@
-Create Database PWCI_Curso;
+Create Database ;
 USE PWCI_Curso;
 
 -- Tablas --

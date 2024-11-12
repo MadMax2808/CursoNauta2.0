@@ -53,7 +53,7 @@
 
         <!-- Enlace de Iniciar Sesión -->
         <div class="login-link">
-            <p>¿Ya tienes cuenta? <a href="Login.html">Iniciar sesión</a></p>
+            <p>¿Ya tienes cuenta? <a href="index.php?page=Login">Iniciar sesión</a></p>
         </div>
     </form>
 </div>

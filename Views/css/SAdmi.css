@@ -105,6 +105,7 @@ tfoot {
     background-color: #f9f9fd;
 }
 
+
 /* Estilo para formularios */
 form {
     display: flex;
@@ -147,8 +148,9 @@ select {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo para el formulario de agregar categoría */
-#add-category-form {
+/* Estilo para los formularios de agregar y editar categoría */
+#add-category-form,
+#edit-category-form {
     padding: 20px;
     background-color: #ffffff;
     border-radius: 10px;
@@ -157,7 +159,8 @@ select {
     border: 1px solid #ddd;
 }
 
-#add-category-form h2 {
+#add-category-form h2,
+#edit-category-form h2 {
     margin-bottom: 20px;
     font-size: 1.6rem;
     color: #6a5b8f;
@@ -165,19 +168,23 @@ select {
     padding-bottom: 10px;
 }
 
-#add-category-form form {
+#add-category-form form,
+#edit-category-form form {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-#add-category-form label {
+#add-category-form label,
+#edit-category-form label {
     font-weight: bold;
     color: #6a5b8f;
 }
 
 #add-category-form input[type="text"],
-#add-category-form textarea {
+#edit-category-form input[type="text"],
+#add-category-form textarea,
+#edit-category-form textarea {
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ddd;
@@ -186,19 +193,20 @@ select {
     color: #333;
 }
 
-#add-category-form textarea {
+#add-category-form textarea,
+#edit-category-form textarea {
     resize: vertical;
 }
 
-#add-category-form .button-group {
+#add-category-form .button-group,
+#edit-category-form .button-group {
     display: flex;
     gap: 10px;
-    /* Espacio entre los botones */
     justify-content: flex-end;
-    /* Alineación de los botones a la derecha */
 }
 
-#add-category-form button {
+#add-category-form button,
+#edit-category-form button {
     background-color: #6a5b8f;
     color: white;
     border: none;
@@ -209,19 +217,14 @@ select {
     font-size: 1rem;
 }
 
-#add-category-form button:hover {
+#add-category-form button:hover,
+#edit-category-form button:hover {
     background-color: #574b7b;
     transform: scale(1.05);
 }
 
-#add-category-form button:focus {
+#add-category-form button:focus,
+#edit-category-form button:focus {
     outline: 2px solid #6a5b8f;
     outline-offset: 2px;
-}
-
-.admin-container {
-    min-height: calc(100vh - 60px);
-    /* Ajusta según la altura de tu footer */
-    display: flex;
-    flex-direction: column;
 }

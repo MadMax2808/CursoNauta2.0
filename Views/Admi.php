@@ -33,7 +33,14 @@ $cursos = $cursoController->mostrarCursos();
 $cursoController->cambiarEstadoCurso();
 ?>
 
+<!------------ SECCION DE REPORTES --------------->
+<?php
+require_once 'Controllers/ReportesController.php';
 
+$reportesController = new ReportesController();
+$reporteInstructores = $reportesController->mostrarReporteInstructores();
+$reporteEstudiantes = $reportesController->mostrarReporteEstudiantes();
+?>
 <!--------------------------- SECCION DE HTML --------------------------------->
 
 <div class="admin-container">
@@ -142,7 +149,8 @@ $cursoController->cambiarEstadoCurso();
                         <tr>
                             <th>Título</th>
                             <th>Descripción</th>
-                            <!-- <th>Acción</th> -->
+                            <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,24 +159,39 @@ $cursoController->cambiarEstadoCurso();
                                 <tr>
                                     <td><?php echo htmlspecialchars($categoria['nombre_categoria']); ?></td>
                                     <td><?php echo htmlspecialchars($categoria['descripcion']); ?></td>
-                                    <!-- <td>
-                                        <button>Editar</button>
-                                        <button>Borrar</button>
-                                    </td> -->
+                                    <td><?php echo $categoria['activo'] ? 'Activo' : 'Inactivo'; ?></td>
+                                    <td>
+                                        <!-- Botón de Editar -->
+                                        <button onclick="editarCategoria(
+                                <?php echo $categoria['id_categoria']; ?>, 
+                                '<?php echo htmlspecialchars($categoria['nombre_categoria']); ?>', 
+                                '<?php echo htmlspecialchars($categoria['descripcion']); ?>'
+                            )">Editar</button>
+
+                                        <!-- Botón de Activar/Desactivar -->
+                                        <form method="POST" style="display:inline" onsubmit="return confirmarAccion()">
+                                            <input type="hidden" name="id_categoria" value="<?php echo $categoria['id_categoria']; ?>">
+                                            <input type="hidden" name="nuevoEstado" value="<?php echo $categoria['activo'] ? 0 : 1; ?>">
+                                            <input type="hidden" name="action" value="toggle">
+                                            <button type="submit">
+                                                <?php echo $categoria['activo'] ? 'Desactivar' : 'Activar'; ?>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3">No tienes categorías registradas.</td>
+                                <td colspan="4">No tienes categorías registradas.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
 
-                <!-- Agregar Categoria -->
+                <!-- Formulario para agregar nueva categoría -->
                 <button type="button" onclick="toggleCategoryForm(true)">Agregar Nueva Categoría</button>
 
-                <div id="add-category-form">
+                <div id="add-category-form" style="display: none;">
                     <h2>Agregar Nueva Categoría</h2>
                     <form id="category-form" method="post" action="index.php?page=CC">
                         <input type="hidden" id="id_creador" name="id_creador" value="<?php echo $userId; ?>">
@@ -187,22 +210,40 @@ $cursoController->cambiarEstadoCurso();
                     </form>
                 </div>
 
+                <!-- Formulario para editar categoría -->
+                <div id="edit-category-form" style="display: none;">
+                    <h2>Editar Categoría</h2>
+                    <form id="category-edit-form" method="post" action="index.php?page=CC">
+                        <input type="hidden" name="id_categoria" id="edit-id_categoria">
+                        <input type="hidden" name="action" value="edit">
+
+                        <label for="edit-category-title">Título:</label>
+                        <input type="text" id="edit-category-title" name="nombre_categoria">
+
+                        <label for="edit-category-description">Descripción:</label>
+                        <textarea id="edit-category-description" name="descripcion" rows="4"></textarea>
+
+                        <div class="button-group">
+                            <button type="submit">Guardar Cambios</button>
+                            <button type="button" onclick="toggleEditCategoryForm(false)">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
 
             <!-- Sección de Reportes -->
             <div class="section" id="reportes" style="display: none;">
                 <h1>Obtener Reportes</h1>
-                <!-- <form> -->
                 <label for="user-type">Tipo de Usuario:</label>
                 <select id="user-type" name="user-type">
                     <option value="instructor">Instructor</option>
                     <option value="estudiante">Estudiante</option>
                 </select>
-                <button>Generar Reporte</button>
-                <!-- </form> -->
+                <button onclick="generateReport()">Generar Reporte</button>
 
-                <div class="course-details">
-
+                <!-- Reporte de Instructores -->
+                <div class="course-details" id="instructor-report" style="display: none;">
                     <h2>Reporte de Instructores</h2>
                     <table>
                         <thead>
@@ -215,17 +256,21 @@ $cursoController->cambiarEstadoCurso();
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>instructor1</td>
-                                <td>Laura Gómez</td>
-                                <td>01/01/2023</td>
-                                <td>5</td>
-                                <td>$5000</td>
-                            </tr>
-
+                            <?php foreach ($reporteInstructores as $instructor): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($instructor['id_instructor']); ?></td>
+                                    <td><?php echo htmlspecialchars($instructor['nombre_instructor']); ?></td>
+                                    <td><?php echo htmlspecialchars($instructor['fecha_ingreso']); ?></td>
+                                    <td><?php echo htmlspecialchars($instructor['cantidad_cursos_ofrecidos']); ?></td>
+                                    <td><?php echo htmlspecialchars($instructor['total_ganancias']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
 
+                <!-- Reporte de Estudiantes -->
+                <div class="course-details" id="student-report" style="display: none;">
                     <h2>Reporte de Estudiantes</h2>
                     <table>
                         <thead>
@@ -238,18 +283,20 @@ $cursoController->cambiarEstadoCurso();
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>estudiante1</td>
-                                <td>Carmen Díaz</td>
-                                <td>15/02/2023</td>
-                                <td>3</td>
-                                <td>75%</td>
-                            </tr>
-
+                            <?php foreach ($reporteEstudiantes as $estudiante): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($estudiante['id_estudiante']); ?></td>
+                                    <td><?php echo htmlspecialchars($estudiante['nombre_estudiante']); ?></td>
+                                    <td><?php echo htmlspecialchars($estudiante['fecha_ingreso']); ?></td>
+                                    <td><?php echo htmlspecialchars($estudiante['cantidad_cursos_inscritos']); ?></td>
+                                    <td><?php echo htmlspecialchars($estudiante['porcentaje_cursos_terminados']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
