@@ -2,7 +2,31 @@
 
 <link rel="stylesheet" href="Views/css/SVentas.css">
 
-<?php include 'Views\Parciales\Nav.php'; ?>
+<?php include 'Views\Parciales\Nav.php';
+
+
+require_once 'Controllers/VentasController.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
+$ventasController = new VentasController($db);
+$data = $ventasController->obtenerVentas();
+$cursosVentas = $data['cursosVentas'];
+$totalesPorPago = $data['totalesPorPago'];
+
+// Verificar si se seleccionó un curso
+$detallesCurso = [];
+$totalIngresosCurso = 0;
+if (isset($_GET['idCurso'])) {
+    $idCurso = (int)$_GET['idCurso'];
+    $detallesCurso = $ventasController->obtenerDetallesCurso($idCurso);
+
+    foreach ($detallesCurso as $detalle) {
+        $totalIngresosCurso += $detalle['precio_pagado'];
+    }
+}
+?>
 
 <!-- Lista Ventas -->
 <div class="container">
@@ -58,61 +82,67 @@
                         <th>Acción</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    <tr class="course-row" data-course="Curso de Desarrollo Web">
-                        <td>Curso de Desarrollo Web</td>
-                        <td>20</td>
-                        <td>85%</td>
-                        <td>$25,000.00</td>
-                        <td>
-                            <button id="course-des">Deshabilitar</button>
-                        </td>
-                    </tr>
-                    <tr class="course-row" data-course="Curso de Programación en Python">
-                        <td>Curso de Programación en Python</td>
-                        <td>15</td>
-                        <td>90%</td>
-                        <td>$18,000.00</td>
-                        <td>
-                            <button>Deshabilitar</button>
-                        </td>
-                    </tr>
+                    <?php foreach ($cursosVentas as $curso) : ?>
+                        <tr class="course-row">
+                            <td><a href="index.php?page=Ventas&idCurso=<?= $curso['id_curso'] ?>"><?= htmlspecialchars($curso['titulo']) ?></a></td>
+                            <td><?= htmlspecialchars($curso['alumnos_inscritos']) ?></td>
+                            <td><?= number_format($curso['nivel_promedio'], 2) . '%' ?></td>
+                            <td>$<?= number_format($curso['ingresos_totales'], 2) ?></td>
+                            <td><button id="course-des">Deshabilitar</button></td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
-                <!-- Total ingresos por todos los cursos -->
+
                 <tfoot>
                     <tr>
                         <td colspan="3">Total ingresos:</td>
-                        <td>Tarjeta: $30,000.00, PayPal: $13,000.00</td>
-                        <td> </td>
+                        <td>
+                            <?php foreach ($totalesPorPago as $pago) : ?>
+                                <?= htmlspecialchars($pago['forma_pago']) ?>: $<?= number_format($pago['total_ingresos'], 2); ?><br>
+                            <?php endforeach; ?>
+                        </td>
+                        <td></td>
                     </tr>
                 </tfoot>
+
             </table>
 
-            <!-- Detalle de Alumnos Oculto -->
-            <div id="course-details" class="course-details" style="display: none;">
-                <h3>Detalles del Curso</h3>
-                <table class="students-table">
-                    <thead>
-                        <tr>
-                            <th>Alumno</th>
-                            <th>Fecha de Inscripción</th>
-                            <th>Nivel de Avance</th>
-                            <th>Precio Pagado</th>
-                            <th>Forma de Pago</th>
-                        </tr>
-                    </thead>
-                    <tbody id="students-body">
-                        <!-- Los detalles de los alumnos se actualizarán dinámicamente -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4">Total ingresos por el curso:</td>
-                            <td id="course-total">$0.00</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+            <!-- Detalle de Alumnos -->
+            <?php if (!empty($detallesCurso)) : ?>
+                <div id="course-details" class="course-details">
+                    <h3>Detalles del Curso</h3>
+                    <table class="students-table">
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Fecha de Inscripción</th>
+                                <th>Nivel de Avance</th>
+                                <th>Precio Pagado</th>
+                                <th>Forma de Pago</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($detallesCurso as $detalle) : ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($detalle['alumno']) ?></td>
+                                    <td><?= htmlspecialchars($detalle['fecha_inscripcion']) ?></td>
+                                    <td><?= htmlspecialchars($detalle['progreso']) . '%' ?></td>
+                                    <td>$<?= number_format($detalle['precio_pagado'], 2) ?></td>
+                                    <td><?= htmlspecialchars($detalle['forma_pago']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4">Total ingresos por el curso:</td>
+                                <td id="course-total">$<?= number_format($totalIngresosCurso, 2) ?></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            <?php endif; ?>
+
 
         </div>
 
