@@ -280,6 +280,35 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE BuscarKardexDinamico(
+    IN in_categoriaID INT,
+    IN in_estado VARCHAR(20),
+    IN in_fechaInicio DATE,
+    IN in_fechaFin DATE,
+    IN in_usuarioID INT
+)
+BEGIN
+    SELECT 
+        i.id_inscripcion,
+        c.titulo AS curso_titulo,
+        i.fecha_inscripcion,
+        i.fecha_ultimo_acceso,
+        i.progreso,
+        i.fecha_terminacion,
+        cat.nombre_categoria AS categoria,
+        i.estado
+    FROM Inscripciones i
+    JOIN Cursos c ON i.id_curso = c.id_curso
+    JOIN Categorias cat ON c.id_categoria = cat.id_categoria
+    WHERE i.id_usuario = in_usuarioID
+      AND (in_categoriaID IS NULL OR c.id_categoria = in_categoriaID)
+      AND (in_estado IS NULL OR i.estado = in_estado)
+      AND (in_fechaInicio IS NULL OR i.fecha_inscripcion >= in_fechaInicio)
+      AND (in_fechaFin IS NULL OR i.fecha_inscripcion <= in_fechaFin);
+END //
+DELIMITER ;
+
 
 
 

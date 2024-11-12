@@ -93,6 +93,35 @@ class InscripcionModel
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
     
+    public function getCategoriasActivas() {
+        try {
+            $query = "SELECT id_categoria, nombre_categoria FROM Categorias WHERE activo = TRUE";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener categorías activas: " . $e->getMessage();
+            return [];
+        }
+    }
+    
+    public function buscarKardexDinamico($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID) {
+        try {
+            $query = "CALL BuscarKardexDinamico(:categoriaID, :estado, :fechaInicio, :fechaFin, :usuarioID)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':categoriaID', $categoriaID, PDO::PARAM_INT);
+            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+            $stmt->bindParam(':fechaInicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fechaFin', $fechaFin, PDO::PARAM_STR);
+            $stmt->bindParam(':usuarioID', $usuarioID, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al buscar cursos en el Kardex: " . $e->getMessage();
+            return [];
+        }
+    }
+    
+
 }

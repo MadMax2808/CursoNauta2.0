@@ -55,6 +55,16 @@ class InscripcionController
     public function generarCertificado($id_curso, $id_usuario) {
         return $this->inscripcionModel->obtenerDatosCertificado($id_curso, $id_usuario);
     }
+    
+    public function getCategoriasActivas() {
+        return $this->inscripcionModel->getCategoriasActivas();
+    }
+
+    public function filtrarCursosInscritos($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID) {
+        return $this->inscripcionModel->buscarKardexDinamico($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID);
+    }
+    
+    
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

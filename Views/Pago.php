@@ -18,8 +18,6 @@ if ($idCurso > 0) {
 }
 ?>
 
-// Código de la página aquí...
-
 <div class="container">
     <div class="course-details">
         <h2>Detalles del Curso</h2>
