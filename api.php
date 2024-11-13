@@ -81,7 +81,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $correo = $_POST['correo'];
             $password = $_POST['contrasena'];
 
-            // Seleccionar el usuario por correo
             $query = "SELECT * FROM usuarios WHERE correo = :correo";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':correo', $correo);
@@ -89,15 +88,26 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
-
                 $response['error'] = "El correo no está registrado.";
             } elseif ($user && $user['activo'] == 0) {
-
                 $response['error'] = "La cuenta está desactivada. Contacta al administrador.";
             } elseif ($user && $password !== $user['contrasena']) {
+                $stmt = $conn->prepare("UPDATE usuarios SET intentos_fallidos = intentos_fallidos + 1 WHERE idUsuario = :idUsuario");
+                $stmt->bindParam(':idUsuario', $user['idUsuario']);
+                $stmt->execute();
 
-                $response['error'] = "Contraseña incorrecta.";
+                if ($user['intentos_fallidos'] + 1 >= 3) {
+                    $stmt = $conn->prepare("UPDATE usuarios SET activo = 0 WHERE idUsuario = :idUsuario");
+                    $stmt->bindParam(':idUsuario', $user['idUsuario']);
+                    $stmt->execute();
+                    $response['error'] = "La cuenta ha sido desactivada después de múltiples intentos fallidos.";
+                } else {
+                    $response['error'] = "Contraseña incorrecta.";
+                }
             } else {
+                $stmt = $conn->prepare("UPDATE usuarios SET intentos_fallidos = 0 WHERE idUsuario = :idUsuario");
+                $stmt->bindParam(':idUsuario', $user['idUsuario']);
+                $stmt->execute();
 
                 $response['message'] = "Inicio de sesión exitoso";
                 $response['user'] = $user;

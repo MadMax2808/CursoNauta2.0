@@ -79,10 +79,32 @@ class CursoController
     {
         return $this->cursoModel->obtenerValoracionPromedio($idCurso);
     }
-    
+
     public function obtenerComentarios($idCurso)
     {
         return $this->cursoModel->obtenerComentarios($idCurso);
+    }
+
+    public function verificarCompraCurso($idCurso, $idUsuario)
+    {
+        return $this->cursoModel->verificarCompraCurso($idCurso, $idUsuario);
+    }
+    public function actualizarProgresoCurso($idCurso, $idUsuario, $nuevoProgreso)
+    {
+        $progresoActual = $this->cursoModel->obtenerProgreso($idCurso, $idUsuario);
+
+        // Si el progreso ya es 100, no actualizamos más
+        if ($progresoActual >= 100) {
+            echo "<script>alert('Curso Finalizado, genere certificado en Kardex');</script>";
+            return false; 
+        }
+        return $this->cursoModel->actualizarProgreso($idCurso, $idUsuario, $nuevoProgreso);
+    }
+
+    public function obtenerProgresoCurso($idCurso, $idUsuario)
+    {
+        return $this->cursoModel->obtenerProgreso($idCurso, $idUsuario);
+    
     }
 }
 
@@ -93,5 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $controlador->agregarCurso();
     } elseif (isset($_POST['action']) && $_POST['action'] === 'cambiarEstadoCurso') {
         $controlador->cambiarEstadoCurso();
+    } else if (isset($_POST['action']) && $_POST['action'] === 'actualizarProgreso') {
+        $idUsuario = $_SESSION['user_id'];
+        $idCurso = intval($_POST['idCurso']);
+        $nuevoProgreso = floatval($_POST['progreso']);
+        $controlador->actualizarProgresoCurso($idCurso, $idUsuario, $nuevoProgreso);
     }
 }

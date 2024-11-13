@@ -8,12 +8,20 @@ require_once 'Controllers/CursoController.php';
 
 $cursoController = new CursoController();
 $idCurso = isset($_GET['idCurso']) ? intval($_GET['idCurso']) : 0;
+$idUsuario = $_SESSION['user_id'] ?? null;
 
 if ($idCurso > 0) {
     $curso = $cursoController->obtenerCursoPorId($idCurso);
+    $esGratuito = $curso['costo'] == 0;
+    $haComprado = $idUsuario ? $cursoController->verificarCompraCurso($idCurso, $idUsuario) : false;
     $niveles = $cursoController->obtenerNivelesPorCurso($idCurso);
     $valoracionPromedio = $cursoController->obtenerValoracionPromedio($idCurso);
     $comentarios = $cursoController->obtenerComentarios($idCurso);
+
+    // Obtener el progreso actual del usuario
+    $progreso = $cursoController->obtenerProgresoCurso($idCurso, $idUsuario); // Obtenemos el progreso actual del usuario
+
+    $nivelesCompletados = floor($progreso / (100 / count($niveles)));
 } else {
     echo "Curso no encontrado.";
     exit;
@@ -21,7 +29,6 @@ if ($idCurso > 0) {
 ?>
 
 <div class="course-container">
-
     <div class="course-header" style="background-image: url('data:image/jpeg;base64,<?php echo base64_encode($curso['imagen']); ?>');">
         <h1 class="course-title"><?php echo htmlspecialchars($curso['titulo']); ?></h1>
         <p class="course-category">Categoría: <?php echo htmlspecialchars($curso['nombre_categoria']); ?></p>
@@ -38,11 +45,20 @@ if ($idCurso > 0) {
     <div class="course-content">
         <div class="video-and-topics">
             <div class="video-section">
-                <video id="course-video" controls></video>
-                <h4>Tu progreso: 50%</h4>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 50%;"></div>
-                </div>
+
+                <!-- Mostrar el video siempre, pero solo habilitar el contenido si el curso fue comprado o es gratuito -->
+                <video id="course-video" controls>
+                    <source src="data:video/mp4;base64,<?php echo base64_encode($curso['video_principal']); ?>" type="video/mp4">
+                    Tu navegador no soporta la reproducción de video.
+                </video>
+
+                <!-- Progreso del curso, visible solo si el curso es gratuito o fue comprado -->
+                <?php if ($esGratuito || $haComprado): ?>
+                    <h4>Tu progreso: <?php echo htmlspecialchars($progreso); ?>%</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: <?php echo htmlspecialchars($progreso); ?>%;"></div>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="topics-section">
@@ -58,27 +74,29 @@ if ($idCurso > 0) {
                                 <span class="arrow">▶</span>
                             </button>
                             <ul class="subtopics-list">
-                                <!-- Enlace al video -->
-                                <li>
-                                    <input type="checkbox" class="subtopic-checkbox" id="subtopic<?php echo $nivel['id_nivel']; ?>">
-                                    <label for="subtopic<?php echo $nivel['id_nivel']; ?>">
-                                        <a href="data:video/mp4;base64,<?php echo base64_encode($nivel['video']); ?>" class="subtopic-link">
-                                            Ver Video de <?php echo htmlspecialchars($nivel['titulo_nivel']); ?>
-                                        </a>
-                                    </label>
-                                </li>
-                                <!-- Visualización del archivo adicional en línea usando solo <object> -->
-                                <?php if (!empty($nivel['archivos'])): ?>
+                                <?php if ($esGratuito || $haComprado): ?>
+                                    <!-- Mostrar contenido del nivel solo si el curso fue comprado o es gratuito -->
                                     <li>
-                                        <?php
-                                        $finfo = new finfo(FILEINFO_MIME_TYPE);
-                                        $mime_type = $finfo->buffer($nivel['archivos']);
-                                        ?>
-                                        <object data="data:<?php echo $mime_type; ?>;base64,<?php echo base64_encode($nivel['archivos']); ?>"
-                                            type="<?php echo $mime_type; ?>" width="100%" height="300px">
-                                            <p>Tu navegador no puede mostrar este archivo.</p>
-                                        </object>
+                                        <label for="subtopic<?php echo $nivel['id_nivel']; ?>">
+                                            <a href="data:video/mp4;base64,<?php echo base64_encode($nivel['video']); ?>" class="subtopic-link">
+                                                Ver Video de <?php echo htmlspecialchars($nivel['titulo_nivel']); ?>
+                                            </a>
+                                        </label>
                                     </li>
+                                    <?php if (!empty($nivel['archivos'])): ?>
+                                        <li>
+                                            <?php
+                                            $finfo = new finfo(FILEINFO_MIME_TYPE);
+                                            $mime_type = $finfo->buffer($nivel['archivos']);
+                                            ?>
+                                            <object data="data:<?php echo $mime_type; ?>;base64,<?php echo base64_encode($nivel['archivos']); ?>"
+                                                type="<?php echo $mime_type; ?>" width="100%" height="300px">
+                                                <p>Tu navegador no puede mostrar este archivo.</p>
+                                            </object>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <p>Contenido disponible solo para usuarios que hayan adquirido el curso.</p>
                                 <?php endif; ?>
                             </ul>
                         </li>
@@ -86,7 +104,12 @@ if ($idCurso > 0) {
                 </ul>
             </div>
         </div>
-
+        <!-- Formulario oculto para enviar el progreso al completar un video -->
+        <form id="progresoForm" method="POST">
+            <input type="hidden" name="idCurso" value="<?php echo $idCurso; ?>">
+            <input type="hidden" name="progreso" id="progreso" value="">
+            <input type="hidden" name="action" value="actualizarProgreso">
+        </form>
         <div class="course-resources">
             <div class="resource-header">
                 <span>Recursos</span>
@@ -95,34 +118,36 @@ if ($idCurso > 0) {
             <div class="resource-content">
                 <ul>
                     <?php foreach ($niveles as $nivel): ?>
-                        <?php if (!empty($nivel['archivos'])): ?>
-                            <?php
-                            // Detectar el tipo MIME del archivo y asignar extensión adecuada
-                            $finfo = new finfo(FILEINFO_MIME_TYPE);
-                            $mime_type = $finfo->buffer($nivel['archivos']);
-                            $extension = '';
+                        <?php if ($esGratuito || $haComprado): ?>
+                            <?php if (!empty($nivel['archivos'])): ?>
+                                <?php
+                                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                                $mime_type = $finfo->buffer($nivel['archivos']);
+                                $extension = '';
 
-                            switch ($mime_type) {
-                                case 'application/pdf':
-                                    $extension = '.pdf';
-                                    break;
-                                case 'image/jpeg':
-                                    $extension = '.jpg';
-                                    break;
-                                case 'image/png':
-                                    $extension = '.png';
-                                    break;
-                                    // Agregar más casos según el tipo de archivo
-                                default:
-                                    $extension = '';
-                            }
-                            ?>
-                            <li>
-                                <a href="data:<?php echo $mime_type; ?>;base64,<?php echo base64_encode($nivel['archivos']); ?>"
-                                    download="Archivo_nivel_<?php echo $nivel['numero_nivel'] . $extension; ?>">
-                                    <i class="file-icon">📄</i> Descargar <?php echo htmlspecialchars($nivel['titulo_nivel']); ?> - Nivel <?php echo $nivel['numero_nivel']; ?>
-                                </a>
-                            </li>
+                                switch ($mime_type) {
+                                    case 'application/pdf':
+                                        $extension = '.pdf';
+                                        break;
+                                    case 'image/jpeg':
+                                        $extension = '.jpg';
+                                        break;
+                                    case 'image/png':
+                                        $extension = '.png';
+                                        break;
+                                    default:
+                                        $extension = '';
+                                }
+                                ?>
+                                <li>
+                                    <a href="data:<?php echo $mime_type; ?>;base64,<?php echo base64_encode($nivel['archivos']); ?>"
+                                        download="Archivo_nivel_<?php echo $nivel['numero_nivel'] . $extension; ?>">
+                                        <i class="file-icon">📄</i> Descargar <?php echo htmlspecialchars($nivel['titulo_nivel']); ?> - Nivel <?php echo $nivel['numero_nivel']; ?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <p>Contenido disponible solo para usuarios que hayan adquirido el curso.</p>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
@@ -171,13 +196,15 @@ if ($idCurso > 0) {
         </div>
     </div>
 
-    <div class="course-purchase">
-        <h2>Adquiere este curso</h2>
-        <p class="course-price"><strong>$<?php echo htmlspecialchars($curso['costo']); ?></strong></p>
-        <a href="index.php?page=Pago&idCurso=<?php echo $idCurso; ?>" class="purchase-btn">Comprar Curso</a>
-    </div>
-
+    <!-- Mostrar el botón de compra solo si el curso no ha sido comprado y no es gratuito -->
+    <?php if (!$esGratuito && !$haComprado): ?>
+        <div class="course-purchase">
+            <h2>Adquiere este curso</h2>
+            <p class="course-price"><strong>$<?php echo htmlspecialchars($curso['costo']); ?></strong></p>
+            <a href="index.php?page=Pago&idCurso=<?php echo $idCurso; ?>" class="purchase-btn">Comprar Curso</a>
+        </div>
+    <?php endif; ?>
 </div>
 
-<script src="Views\js\JCurso.js"> </script>
-<?php include 'Views\Parciales\Footer.php'; ?>w
+<script src="Views/js/JCurso.js"></script>
+<?php include 'Views\Parciales\Footer.php'; ?>

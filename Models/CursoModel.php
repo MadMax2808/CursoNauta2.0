@@ -126,4 +126,38 @@ class CursoModel
         $stmt->execute([$idCurso]);
         return $stmt->fetchAll();
     }
+
+    public function verificarCompraCurso($idCurso, $idUsuario)
+    {
+        $query = "SELECT COUNT(*) FROM Inscripciones WHERE id_curso = :idCurso AND id_usuario = :idUsuario";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchColumn();
+
+        return $result > 0; // Retorna true si el usuario compró el curso
+    }
+
+    public function actualizarProgreso($idCurso, $idUsuario, $nuevoProgreso)
+    {
+        $query = "UPDATE Inscripciones SET progreso = :nuevoProgreso, fecha_ultimo_acceso = NOW() WHERE id_curso = :idCurso AND id_usuario = :idUsuario";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':nuevoProgreso', $nuevoProgreso);
+        $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function obtenerProgreso($idCurso, $idUsuario)
+    {
+        $query = "SELECT progreso FROM Inscripciones WHERE id_curso = :idCurso AND id_usuario = :idUsuario";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result ? $result['progreso'] : 0; // Devuelve 0 si no hay progreso registrado
+    }
 }

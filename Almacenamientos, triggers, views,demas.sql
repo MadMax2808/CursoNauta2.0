@@ -242,6 +242,10 @@ GROUP BY
     u.idUsuario, u.nombre, u.fecha_registro;
 
 
+CREATE VIEW TotalIngresosPorPago AS
+SELECT forma_pago, SUM(precio_pagado) AS total_ingresos
+FROM Ventas
+GROUP BY forma_pago;
 
 
 
@@ -291,6 +295,7 @@ CREATE PROCEDURE BuscarKardexDinamico(
 BEGIN
     SELECT 
         i.id_inscripcion,
+        i.id_curso,  -- Asegúrate de seleccionar id_curso aquí
         c.titulo AS curso_titulo,
         i.fecha_inscripcion,
         i.fecha_ultimo_acceso,
@@ -309,111 +314,40 @@ BEGIN
 END //
 DELIMITER ;
 
+-- TRIGGERS --
 
-
-
-
-
-
-
-
-
-
-
-
-
-
--- No Implementadas --
--- triggers
 DELIMITER //
-CREATE TRIGGER IncrementarIntentosFallidos
+CREATE TRIGGER reset_intentos_fallidos
 AFTER UPDATE ON Usuarios
 FOR EACH ROW
 BEGIN
-    -- Solo incrementar si la contraseña fue incorrecta
-    IF NEW.activo = TRUE AND NEW.intentos_fallidos < 3 THEN
-        UPDATE Usuarios SET intentos_fallidos = intentos_fallidos + 1 WHERE idUsuario = NEW.idUsuario;
-    END IF;
-END //
-DELIMITER ;
-
-DELIMITER //
-CREATE TRIGGER BloquearUsuarioDespuesDeTresIntentos
-AFTER UPDATE ON Usuarios
-FOR EACH ROW
-BEGIN
-    -- Si los intentos fallidos alcanzan 3, bloquear al usuario
-    IF NEW.intentos_fallidos >= 3 THEN
-        UPDATE Usuarios SET activo = FALSE WHERE idUsuario = NEW.idUsuario;
-    END IF;
-END //
-DELIMITER ;
-
--- trigger reestablecer intentos fallidos luego de un inicio de sesion exitoso
-DELIMITER //
-CREATE TRIGGER RestablecerIntentosFallidos
-AFTER UPDATE ON Usuarios
-FOR EACH ROW
-BEGIN
-    -- Si el usuario se activa, restablecer los intentos fallidos a 0
+    -- Solo agrega el idUsuario a la tabla temporal si el usuario ha sido activado
     IF NEW.activo = TRUE AND OLD.activo = FALSE THEN
-        UPDATE Usuarios SET intentos_fallidos = 0 WHERE idUsuario = NEW.idUsuario;
+        INSERT INTO TempUsuariosActivados (idUsuario) VALUES (NEW.idUsuario);
     END IF;
-END //
+END//
 DELIMITER ;
 
--- trigger para manejar inscripciones de cursos
-DELIMITER //
-CREATE TRIGGER RegistrarFechaUltimoAcceso
-AFTER INSERT ON inscripciones
+
+DELIMITER $$
+CREATE TRIGGER trg_update_estado_completado
+BEFORE UPDATE ON Inscripciones
 FOR EACH ROW
 BEGIN
-    -- Actualizar la fecha del último acceso a la fecha de inscripción
-    UPDATE inscripciones
-    SET fecha_ultimo_acceso = NOW()
-    WHERE id_inscripcion = NEW.id_inscripcion;
-END //
-
--- actualizacion de progreso
-DELIMITER //
-CREATE TRIGGER ActualizarEstadoKardex
-AFTER UPDATE ON kardex
-FOR EACH ROW
-BEGIN
-    -- Verificar si el progreso es mayor a 0 pero menor a 100, actualizar estado a 'en curso'
-    IF NEW.progreso > 0 AND NEW.progreso < 100 THEN
-        UPDATE kardex
-        SET estado = 'en curso'
-        WHERE id_kardex = NEW.id_kardex;
+    -- Verificar si el progreso es igual o superior a 100%
+    IF NEW.progreso >= 100 THEN
+        -- Actualizar el estado a 'completado' y establecer completado a TRUE
+        SET NEW.estado = 'completado';
+        SET NEW.completado = TRUE;
+        SET NEW.fecha_terminacion = NOW();
     END IF;
-
-    -- Verificar si el progreso es igual a 100, actualizar estado a 'completado' y fecha_terminacion
-    IF NEW.progreso = 100 THEN
-        UPDATE kardex
-        SET estado = 'completado',
-            fecha_terminacion = NOW()
-        WHERE id_kardex = NEW.id_kardex;
-    END IF;
-END;
-//
+END$$
 DELIMITER ;
 
--- actualizar progreso curso
-DELIMITER //
 
-CREATE TRIGGER ActualizarProgreso
-AFTER UPDATE ON Inscripciones
-FOR EACH ROW
-BEGIN
-    -- Verificar si el progreso está entre 0 y 100, y actualizar la tabla kardex
-    IF NEW.progreso >= 0 AND NEW.progreso <= 100 THEN
-        UPDATE kardex
-        SET progreso = NEW.progreso
-        WHERE idUsuario = NEW.idUsuario AND id_curso = NEW.id_curso;
-    END IF;
-END //
 
-DELIMITER ;
+
+DROP TRIGGER IF EXISTS reset_intentos_fallidos;
 
 
 

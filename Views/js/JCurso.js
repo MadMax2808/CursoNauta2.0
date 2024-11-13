@@ -21,41 +21,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cargar el video seleccionado en el reproductor de la izquierda
     const subtopicLinks = document.querySelectorAll('.subtopic-link');
     const video = document.getElementById('course-video');
+    const totalNiveles = subtopicLinks.length;
 
-    subtopicLinks.forEach(link => {
+    subtopicLinks.forEach((link, index) => {
         link.addEventListener('click', function(e) {
             e.preventDefault(); // Evita la navegación
             video.src = this.getAttribute('href'); // Actualiza la fuente del video
             video.load(); // Carga el nuevo video
             video.play(); // Reproduce el video automáticamente
-            this.previousElementSibling.checked = true; // Marca la casilla de verificación del subtema
+
+            // Al finalizar el video, marcar la casilla de verificación y enviar el progreso
+            video.onended = function() {
+                const progreso = ((index + 1) / totalNiveles) * 100;
+                document.getElementById('progreso').value = progreso;
+                document.getElementById('progresoForm').submit();
+
+            };
         });
     });
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    
-    const links = document.querySelectorAll('.subtopic-link');
-
-    links.forEach(link => {
-     
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-       
-            const linkId = this.parentElement.getAttribute('for');
-      
-            const checkboxId = linkId ? linkId : '';
-       
-            const checkbox = document.getElementById(checkboxId);
-
-            if (checkbox) {
-                checkbox.checked = true;
-            }
-
-        });
-    });
-
 });
 
 document.querySelector('.resource-header').addEventListener('click', function() {
@@ -69,5 +52,4 @@ document.querySelector('.resource-header').addEventListener('click', function() 
         content.style.display = 'block';
         icon.style.transform = 'rotate(90deg)';
     }
-    });
-    
+});

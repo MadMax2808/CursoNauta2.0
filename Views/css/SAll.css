@@ -6,7 +6,10 @@
 }
 
 /* ----------- Filtros ---------- */
-
+a {
+    text-decoration: none;
+    color: inherit;
+}
 .filters {
     background-color: #f9f9f9;
     padding: 20px;
@@ -118,6 +121,7 @@
     color: #6a5b8f;
     margin-bottom: 10px;
 }
+
 
 .stars {
     font-size: 1.3rem;

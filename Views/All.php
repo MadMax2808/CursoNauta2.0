@@ -96,7 +96,7 @@ function renderStars($rating) {
         <div class="course-grid">
             <?php if (!empty($cursos)): ?>
                 <?php foreach ($cursos as $curso): ?>
-                     <a href="index.php?page=Curso&idCurso=<?= $curso['id_curso'] ?>">
+                    <a href="index.php?page=Curso&idCurso=<?= $curso['id_curso'] ?>">
                     <div class="course-card">
                         <img src="data:image/jpeg;base64,<?= base64_encode($curso['imagen']) ?>" alt="Imagen del Curso" class="course-img">
                         <h3><?= htmlspecialchars($curso['titulo']) ?></h3>
