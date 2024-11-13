@@ -127,7 +127,6 @@ SELECT * FROM Usuarios;
 SELECT * FROM Categorias;
 SELECT * FROM Cursos;
 SELECT * FROM Niveles;
-SELECT * FROM Inscripciones;
 SELECT * FROM Ventas;
 SELECT * FROM Mensajes;
 SELECT * FROM Comentarios;

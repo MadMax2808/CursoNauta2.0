@@ -296,7 +296,7 @@ BEGIN
     SELECT 
         i.id_inscripcion,
         i.id_curso,  -- Asegúrate de seleccionar id_curso aquí
-        c.titulo AS curso_titulo,
+        c.titulo AS titulo,
         i.fecha_inscripcion,
         i.fecha_ultimo_acceso,
         i.progreso,
@@ -313,6 +313,44 @@ BEGIN
       AND (in_fechaFin IS NULL OR i.fecha_inscripcion <= in_fechaFin);
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE BuscarVentasDinamico(
+    IN in_categoriaID INT,
+    IN in_estado VARCHAR(20),
+    IN in_fechaInicio DATE,
+    IN in_fechaFin DATE,
+    IN in_usuarioID INT
+)
+BEGIN
+    SELECT 
+        c.id_curso,
+        c.titulo AS titulo,
+        c.activo,
+        COUNT(i.id_usuario) AS alumnos_inscritos,
+        AVG(i.progreso) AS nivel_promedio,
+        SUM(v.precio_pagado) AS ingresos_totales,
+        cat.nombre_categoria AS categoria
+    FROM Cursos c
+    LEFT JOIN Inscripciones i ON c.id_curso = i.id_curso
+    LEFT JOIN Ventas v ON c.id_curso = v.id_curso
+    LEFT JOIN Categorias cat ON c.id_categoria = cat.id_categoria
+    WHERE c.id_instructor = in_usuarioID
+      AND (in_categoriaID IS NULL OR c.id_categoria = in_categoriaID)
+      AND (in_estado IS NULL 
+           OR (in_estado = 'activo' AND c.activo = 1)
+           OR (in_estado = 'inactivo' AND c.activo = 0))
+      AND (in_fechaInicio IS NULL OR v.fecha_venta >= in_fechaInicio)
+      AND (in_fechaFin IS NULL OR v.fecha_venta <= in_fechaFin)
+    GROUP BY c.id_curso;
+END //
+DELIMITER ;
+
+
+
+CALL BuscarVentasDinamico(NULL, 1, NULL, NULL, 23);
+
+
 
 -- TRIGGERS --
 

@@ -24,5 +24,18 @@ class VentasController
         return $this->model->getDetallesCurso($idCurso);
     }
 
+    public function obtenerCategoriasActivas()
+    {
+        return $this->model->getCatActivas();
+    }
 
+
+    public function filtrarVentas($categoriaID, $estado, $fechaInicio, $fechaFin)
+    {
+        $userId = $_SESSION['user_id'];
+        $cursosVentas = $this->model->buscarVentasDinamico( $categoriaID, $estado, $fechaInicio, $fechaFin, $userId);
+        $totalesPorPago = $this->model->getTotalesPorPago($userId); // Filtra los totales por usuario
+
+        return ['cursosVentas' => $cursosVentas, 'totalesPorPago' => $totalesPorPago];
+    }
 }
