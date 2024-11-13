@@ -96,8 +96,6 @@ END //
 DELIMITER ;
 
 
-
-
 -- Funcion1 ---
 DELIMITER //
 CREATE FUNCTION obtenerPromedioCurso(idCurso INT)
@@ -109,7 +107,7 @@ BEGIN
     SELECT AVG(calificacion)
     INTO promedio
     FROM Comentarios
-    WHERE id_curso = idCurso AND eliminado = 0;
+    WHERE id_curso = idCurso;
 
     RETURN IFNULL(promedio, 0);
 END //
