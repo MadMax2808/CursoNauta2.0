@@ -116,7 +116,7 @@ class CursoModel
     public function obtenerComentarios($idCurso)
     {
         $stmt = $this->conn->prepare("
-            SELECT c.comentario, c.calificacion, c.fecha_comentario, c.id_usuario, c.eliminado,
+            SELECT c.id_comentario, c.comentario, c.calificacion, c.fecha_comentario, c.id_usuario, c.eliminado,
                    u.nombre AS nombre_usuario, u.foto_avatar 
             FROM Comentarios AS c
             JOIN Usuarios AS u ON c.id_usuario = u.idUsuario
@@ -127,6 +127,18 @@ class CursoModel
         return $stmt->fetchAll();
     }
 
+    public function eliminarComentario($idComentario, $motivoEliminacion)
+    {
+        $query = "UPDATE Comentarios SET eliminado = TRUE, motivo_eliminacion = :motivo WHERE id_comentario = :id_comentario";
+        $stmt = $this->conn->prepare($query);
+
+        // Vincular parámetros
+        $stmt->bindParam(':motivo', $motivoEliminacion);
+        $stmt->bindParam(':id_comentario', $idComentario, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+    
     public function verificarCompraCurso($idCurso, $idUsuario)
     {
         $query = "SELECT COUNT(*) FROM Inscripciones WHERE id_curso = :idCurso AND id_usuario = :idUsuario";

@@ -106,6 +106,23 @@ class CursoController
         return $this->cursoModel->obtenerProgreso($idCurso, $idUsuario);
     
     }
+
+    public function eliminarComentario()
+    {
+        if (isset($_POST['idComentario']) && isset($_POST['motivo']) && isset($_POST['idCurso'])) {
+            $idComentario = $_POST['idComentario'];
+            $motivo = $_POST['motivo'];
+            $idCurso = $_POST['idCurso'];
+
+            if ($this->cursoModel->eliminarComentario($idComentario, $motivo)) {
+                header("Location: index.php?page=Curso&idCurso=" . $idCurso);
+            } else {
+                echo "Error al eliminar el comentario.";
+            }
+        }
+    }
+
+
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -120,5 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $idCurso = intval($_POST['idCurso']);
         $nuevoProgreso = floatval($_POST['progreso']);
         $controlador->actualizarProgresoCurso($idCurso, $idUsuario, $nuevoProgreso);
+    }elseif (isset($_POST['action']) && $_POST['action'] === 'eliminarComentario') {
+        $controlador->eliminarComentario();
     }
 }

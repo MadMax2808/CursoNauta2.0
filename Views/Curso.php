@@ -110,6 +110,7 @@ if ($idCurso > 0) {
             <input type="hidden" name="progreso" id="progreso" value="">
             <input type="hidden" name="action" value="actualizarProgreso">
         </form>
+
         <div class="course-resources">
             <div class="resource-header">
                 <span>Recursos</span>
@@ -166,6 +167,17 @@ if ($idCurso > 0) {
                 <span>(<?php echo count($comentarios); ?> valoraciones)</span>
             </div>
 
+               <!-- Modal para Eliminar con Motivo -->
+            <div id="deleteModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2>¿Por qué deseas eliminar este comentario?</h2>
+                    <textarea id="motivo" placeholder="Escribe tu motivo aquí..."></textarea>
+                    <button id="confirmDelete" class="confirm-btn">Confirmar Eliminación</button>
+                </div>
+            </div>
+
+
             <div class="comments">
                 <h2>Comentarios</h2>
                 <?php foreach ($comentarios as $comentario): ?>
@@ -174,21 +186,32 @@ if ($idCurso > 0) {
                             <img src="<?php echo htmlspecialchars($comentario['foto_avatar'] ?: 'Recursos/Icon.png'); ?>"
                                 alt="Foto del Usuario" class="comment-user-img">
                             <div>
-                                <p class="comment-username"><?php echo htmlspecialchars($comentario['nombre_usuario']); ?></p>
-                                <p class="comment-date"><?php echo htmlspecialchars(date('d/m/Y, H:i', strtotime($comentario['fecha_comentario']))); ?></p>
+                                <p class="comment-username"><?php echo htmlspecialchars($comentario['nombre_usuario']); ?>
+                                </p>
+                                <p class="comment-date">
+                                    <?php echo htmlspecialchars(date('d/m/Y, H:i', strtotime($comentario['fecha_comentario']))); ?>
+                                </p>
                             </div>
                         </div>
 
                         <!-- Mostrar comentario o mensaje de eliminado -->
                         <?php if ($comentario['eliminado']): ?>
                             <p class="comment-text"><em>(Este comentario ha sido eliminado por el administrador)</em></p>
+                            
                         <?php else: ?>
                             <p class="comment-text"><?php echo htmlspecialchars($comentario['comentario']); ?></p>
                         <?php endif; ?>
 
                         <!-- Botón de Eliminar para administradores -->
                         <?php if ($_SESSION['user_role'] == 1 && !$comentario['eliminado']): ?>
-                            <button class="delete-btn">Eliminar</button>
+                            <form action="" method="POST" class="delete-comment-form"
+                                data-id="<?php echo $comentario['id_comentario']; ?>">
+                                <input type="hidden" name="action" value="eliminarComentario">
+                                <input type="hidden" name="idComentario" value="<?php echo $comentario['id_comentario']; ?>">
+                                <input type="hidden" name="idCurso" value="<?php echo $idCurso; ?>">
+                                <button type="button" class="delete-btn"
+                                    data-id="<?php echo $comentario['id_comentario']; ?>">Eliminar</button>
+                            </form>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>

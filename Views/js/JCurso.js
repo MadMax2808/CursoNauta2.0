@@ -53,3 +53,57 @@ document.querySelector('.resource-header').addEventListener('click', function() 
         icon.style.transform = 'rotate(90deg)';
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtns = document.querySelectorAll('.delete-btn');
+    const modal = document.getElementById('deleteModal');
+    const closeBtn = document.querySelector('.close-btn');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const motivoTextarea = document.getElementById('motivo');
+    let comentarioId = null; // Para almacenar el id del comentario a eliminar
+
+    // Abre el modal y almacena el id del comentario al hacer clic en el botón de eliminar
+    deleteBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            comentarioId = this.getAttribute('data-id');
+            modal.style.display = 'block';
+        });
+    });
+
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    confirmDeleteBtn.addEventListener('click', function() {
+        const motivo = motivoTextarea.value.trim();
+        if (motivo && comentarioId) {
+            // Buscar el formulario correspondiente al comentario que se quiere eliminar
+            const form = document.querySelector(`form[data-id="${comentarioId}"]`);
+            
+            if (form) {
+                // Crear el campo oculto con el motivo de eliminación
+                const motivoInput = document.createElement('input');
+                motivoInput.type = 'hidden';
+                motivoInput.name = 'motivo';
+                motivoInput.value = motivo;
+
+                // Agregar el input al formulario
+                form.appendChild(motivoInput);
+
+                // Enviar el formulario
+                form.submit();
+                modal.style.display = 'none';
+            } else {
+                alert('No se encontró el formulario para este comentario.');
+            }
+        } else {
+            alert('Por favor, proporciona un motivo para la eliminación.');
+        }
+    });
+});
