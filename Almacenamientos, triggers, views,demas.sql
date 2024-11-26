@@ -63,6 +63,30 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE ActualizarCurso(
+    IN p_id_curso INT,
+    IN p_titulo VARCHAR(255),
+    IN p_descripcion TEXT,
+    IN p_imagen BLOB,
+    IN p_costo DECIMAL(10, 2),
+    IN p_id_categoria INT
+)
+BEGIN
+    UPDATE Cursos
+    SET
+        titulo = p_titulo,
+        descripcion = p_descripcion,
+        imagen = IF(p_imagen IS NOT NULL, p_imagen, imagen), -- Solo actualiza la imagen si no es NULL
+        costo = p_costo,
+        id_categoria = p_id_categoria
+    WHERE id_curso = p_id_curso;
+END$$
+DELIMITER ;
+
+
+
+
 
 -- NIVELES --
 DELIMITER //
@@ -81,6 +105,34 @@ BEGIN
     VALUES (p_id_curso, p_numero_nivel, p_titulo_nivel, p_video, p_contenido, p_archivos, p_costo);
 END //
 DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE ActualizarNivel(
+    IN p_id_nivel INT,          
+    IN p_titulo_nivel VARCHAR(255), 
+    IN p_contenido TEXT,       
+    IN p_costo DECIMAL(10, 2)  
+)
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM Niveles
+        WHERE id_nivel = p_id_nivel
+    ) THEN
+        UPDATE Niveles
+        SET 
+            titulo_nivel = p_titulo_nivel,
+            contenido = p_contenido,
+            costo = p_costo
+        WHERE id_nivel = p_id_nivel;
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El nivel especificado no existe.';
+    END IF;
+END$$
+DELIMITER ;
+
+
 
 
 -- INSCRIPCIONES --

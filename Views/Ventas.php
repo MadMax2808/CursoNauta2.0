@@ -128,6 +128,12 @@ $cursoController->cambiarEstadoCurso();
                                             <?php echo $curso['activo'] ? 'Deshabilitar' : 'Habilitar'; ?>
                                         </button>
                                     </form>
+                                    <!-- Botón de editar -->
+                                    <button>
+                                        <a href="index.php?page=EditCurso&id=<?= $curso['id_curso']; ?>" class="edit-course-btn">
+                                            Editar
+                                        </a>
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

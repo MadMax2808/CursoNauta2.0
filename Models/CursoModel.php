@@ -172,4 +172,34 @@ class CursoModel
 
         return $result ? $result['progreso'] : 0; // Devuelve 0 si no hay progreso registrado
     }
+
+    public function actualizarCurso($id_curso, $titulo, $descripcion, $imagen, $costo, $id_categoria)
+    {
+        $query = "CALL ActualizarCurso(:id_curso, :titulo, :descripcion, :imagen, :costo, :id_categoria)";
+        $stmt = $this->conn->prepare($query);
+
+        // Vincular parámetros
+        $stmt->bindParam(':id_curso', $id_curso, PDO::PARAM_INT);
+        $stmt->bindParam(':titulo', $titulo);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':imagen', $imagen, PDO::PARAM_LOB);
+        $stmt->bindParam(':costo', $costo);
+        $stmt->bindParam(':id_categoria', $id_categoria);
+
+        return $stmt->execute();
+    }
+
+    public function actualizarNivel($id_nivel, $titulo_nivel, $contenido, $costo)
+    {
+        $query = "CALL ActualizarNivel(:id_nivel, :titulo_nivel, :contenido, :costo)";
+        $stmt = $this->conn->prepare($query);
+    
+        $stmt->bindParam(':id_nivel', $id_nivel);
+        $stmt->bindParam(':titulo_nivel', $titulo_nivel);
+        $stmt->bindParam(':contenido', $contenido);
+        $stmt->bindParam(':costo', $costo);
+    
+        return $stmt->execute();
+    }
+
 }
