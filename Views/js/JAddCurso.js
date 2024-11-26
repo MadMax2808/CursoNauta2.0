@@ -85,7 +85,7 @@ document.getElementById('course-form').addEventListener('submit', function (even
     if (title === '') errorMessages.push('El título del curso no puede estar vacío.');
     if (description === '') errorMessages.push('La descripción del curso no puede estar vacía.');
     if (levels < 1) errorMessages.push('La cantidad de niveles debe ser al menos 1.');
-    if (coursePrice <= 0) errorMessages.push('El costo del curso debe ser un valor positivo.');
+    if (coursePrice < 0) errorMessages.push('El costo del curso debe ser un valor positivo.');
 
     if (errorMessages.length > 0) {
         event.preventDefault();

@@ -104,7 +104,7 @@ DELIMITER //
 CREATE PROCEDURE InsertarCurso(
     IN p_titulo VARCHAR(255),
     IN p_descripcion TEXT,
-    IN p_imagen BLOB,
+    IN p_imagen MEDIUMBLOB,
     IN p_costo DECIMAL(10, 2),
     IN p_niveles INT,
     IN p_id_instructor INT,
@@ -439,6 +439,22 @@ BEGIN
 END//
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE GetDetallesCurso(IN idCurso INT)
+BEGIN
+    SELECT u.nombre AS alumno, 
+           i.fecha_inscripcion, 
+           i.progreso, 
+           v.precio_pagado, 
+           v.forma_pago, 
+           c.titulo AS titulo
+    FROM Inscripciones i
+    JOIN Usuarios u ON i.id_usuario = u.idUsuario
+    JOIN Ventas v ON i.id_curso = v.id_curso AND i.id_usuario = v.id_usuario
+    JOIN Cursos c ON i.id_curso = c.id_curso
+    WHERE i.id_curso = idCurso;
+END//
+DELIMITER ;
 
 -- -------MENSAJES ---------
 DELIMITER //
@@ -779,8 +795,6 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
-
-
 
 
 DROP TRIGGER IF EXISTS reset_intentos_fallidos;

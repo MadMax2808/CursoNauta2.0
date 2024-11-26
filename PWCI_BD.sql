@@ -38,7 +38,7 @@ CREATE TABLE Cursos (
     id_curso INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     descripcion TEXT,
-    imagen BLOB,  -- Se cambió a BLOB para almacenar imágenes
+    imagen MEDIUMBLOB,  -- Se cambió a BLOB para almacenar imágenes
     costo DECIMAL(10, 2) NOT NULL,
     niveles INT DEFAULT 1,
     calificacion_promedio DECIMAL(3, 2) DEFAULT 0,
@@ -50,6 +50,8 @@ CREATE TABLE Cursos (
 );
 ALTER TABLE Cursos
 ADD fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE Cursos
+MODIFY COLUMN imagen MEDIUMBLOB;
 
 
 CREATE TABLE Niveles (
