@@ -203,7 +203,7 @@ if ($idCurso > 0) {
                         <?php endif; ?>
 
                         <!-- Botón de Eliminar para administradores -->
-                        <?php if ($_SESSION['user_role'] == 1 && !$comentario['eliminado']): ?>
+                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 1 && !$comentario['eliminado']): ?>
                             <form action="" method="POST" class="delete-comment-form"
                                 data-id="<?php echo $comentario['id_comentario']; ?>">
                                 <input type="hidden" name="action" value="eliminarComentario">
@@ -220,7 +220,7 @@ if ($idCurso > 0) {
     </div>
 
     <!-- Mostrar el botón de compra solo si el curso no ha sido comprado y no es gratuito -->
-    <?php if (!$esGratuito && !$haComprado): ?>
+    <?php if (!$haComprado): ?>
         <div class="course-purchase">
             <h2>Adquiere este curso</h2>
             <p class="course-price"><strong>$<?php echo htmlspecialchars($curso['costo']); ?></strong></p>

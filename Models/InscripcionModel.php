@@ -24,15 +24,12 @@ class InscripcionModel
             return false;
         }
     }
-    public function obtenerCursosInscritos($idUsuario) {
+
+    public function obtenerCursosInscritos($idUsuario)
+    {
         try {
-            $query = "
-                SELECT i.*, c.titulo AS curso_titulo, cat.nombre_categoria AS categoria
-                FROM Inscripciones i
-                JOIN Cursos c ON i.id_curso = c.id_curso
-                JOIN Categorias cat ON c.id_categoria = cat.id_categoria
-                WHERE i.id_usuario = :id_usuario";
-            $stmt = $this->conn->prepare($query);
+            $sql = "CALL ObtenerCursosInscritosPorUsuario(:id_usuario)";
+            $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -41,13 +38,12 @@ class InscripcionModel
             return [];
         }
     }
-    
-    public function registrarVenta($idCurso, $idUsuario, $precioPagado, $formaPago) {
+
+    public function registrarVenta($idCurso, $idUsuario, $precioPagado, $formaPago)
+    {
         try {
-            $query = "
-                INSERT INTO Ventas (id_curso, id_usuario, precio_pagado, forma_pago)
-                VALUES (:id_curso, :id_usuario, :precio_pagado, :forma_pago)";
-            $stmt = $this->conn->prepare($query);
+            $sql = "CALL registrarVentaCurso(:id_curso, :id_usuario, :precio_pagado, :forma_pago)";
+            $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':id_curso', $idCurso, PDO::PARAM_INT);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->bindParam(':precio_pagado', $precioPagado, PDO::PARAM_STR);
@@ -59,44 +55,47 @@ class InscripcionModel
             return false;
         }
     }
-    public function inscripcionYaRegistrada($idCurso, $idUsuario) {
+
+    public function inscripcionYaRegistrada($idCurso, $idUsuario)
+    {
         try {
-            $query = "SELECT COUNT(*) FROM Inscripciones WHERE id_curso = :id_curso AND id_usuario = :id_usuario";
-            $stmt = $this->conn->prepare($query);
+            $sql = "CALL verificarInscripcion(:id_curso, :id_usuario, @p_existe)";
+            $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':id_curso', $idCurso, PDO::PARAM_INT);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->execute();
-            
-            return $stmt->fetchColumn() > 0; // Retorna true si ya existe una inscripción, false si no
+
+            // Obtener el valor del parámetro de salida
+            $result = $this->conn->query("SELECT @p_existe")->fetch(PDO::FETCH_ASSOC);
+            return $result['@p_existe'] > 0; // Retorna true si ya existe una inscripción, false si no
         } catch (PDOException $e) {
             echo "Error al verificar la inscripción: " . $e->getMessage();
             return false;
         }
     }
 
-    public function obtenerDatosCertificado($id_curso, $id_usuario) {
-        $query = "SELECT 
-                    u.nombre AS nombre_estudiante,
-                    c.titulo AS nombre_curso,
-                    i.fecha_terminacion,
-                    instructor.nombre AS nombre_instructor
-                  FROM Inscripciones i
-                  JOIN Usuarios u ON i.id_usuario = u.idUsuario
-                  JOIN Cursos c ON i.id_curso = c.id_curso
-                  JOIN Usuarios instructor ON c.id_instructor = instructor.idUsuario
-                  WHERE i.id_curso = :id_curso AND i.id_usuario = :id_usuario AND i.completado = 1";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_curso', $id_curso);
-        $stmt->bindParam(':id_usuario', $id_usuario);
-        $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-    
-    public function getCategoriasActivas() {
+    public function obtenerDatosCertificado($id_curso, $id_usuario)
+    {
         try {
-            $query = "SELECT id_categoria, nombre_categoria FROM Categorias WHERE activo = TRUE";
+            // Llamamos al procedimiento almacenado
+            $sql = "CALL obtenerDatosCertificado(:id_curso, :id_usuario)";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id_curso', $id_curso, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Devolvemos el resultado directamente
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los datos del certificado: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function getCategoriasActivas()
+    {
+        try {
+            $query = "CALL ObtenerCategoriasActivas()";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -105,8 +104,9 @@ class InscripcionModel
             return [];
         }
     }
-    
-    public function buscarKardexDinamico($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID) {
+
+    public function buscarKardexDinamico($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID)
+    {
         try {
             $query = "CALL BuscarKardexDinamico(:categoriaID, :estado, :fechaInicio, :fechaFin, :usuarioID)";
             $stmt = $this->conn->prepare($query);
@@ -122,6 +122,4 @@ class InscripcionModel
             return [];
         }
     }
-    
-
 }

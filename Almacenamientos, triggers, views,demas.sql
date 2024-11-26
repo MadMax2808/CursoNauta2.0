@@ -1,9 +1,8 @@
 USE PWCI_Curso;
--- Procedimientos Almacenados --
--- IMPLEMENTADOS --
+-- ---------------- PROCEDIMIENTOS AMACENADOS -------------------------
 
--- USUARIOS --
--- Procedimiento para bloquear usuario después de 3 intentos fallidos
+
+-- ------USUARIOS --------
 DELIMITER //
 CREATE PROCEDURE BloquearUsuario(IN user_id INT)
 BEGIN
@@ -11,7 +10,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- Procedimiento para Cambiar Estado
 DELIMITER //
 CREATE PROCEDURE CambiarEstadoUsuario(
     IN p_idUsuario INT,
@@ -24,9 +22,16 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE ObtenerUsuarios()
+BEGIN
+    SELECT idUsuario, nombre, correo, fecha_registro, activo, id_rol
+    FROM Usuarios;
+END //
+DELIMITER ;
 
--- CATEGORIAS --
--- Registro de Categoría
+-- ------CATEGORIAS ----------
+
 DELIMITER //
 CREATE PROCEDURE RegistrarCategoria(
     IN nombre_categoria VARCHAR(255),
@@ -39,9 +44,62 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE ObtenerCategorias(IN p_id_creador INT)
+BEGIN
+    SELECT id_categoria, nombre_categoria, descripcion, activo
+    FROM Categorias
+    WHERE id_creador = p_id_creador;
+END //
+DELIMITER ;
 
--- CURSOS --
--- Procedimiento para publicar un curso
+DELIMITER //
+CREATE PROCEDURE GetAllCategorias()
+BEGIN
+    SELECT id_categoria, nombre_categoria
+    FROM Categorias;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ActualizarCategoria(
+    IN p_id_categoria INT,
+    IN p_nombre_categoria VARCHAR(255),
+    IN p_descripcion TEXT
+)
+BEGIN
+    UPDATE Categorias
+    SET nombre_categoria = p_nombre_categoria, descripcion = p_descripcion
+    WHERE id_categoria = p_id_categoria;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE CambiarEstadoCategoria(
+    IN p_id_categoria INT,
+    IN p_nuevoEstado BOOLEAN
+)
+BEGIN
+    UPDATE Categorias
+    SET activo = p_nuevoEstado
+    WHERE id_categoria = p_id_categoria;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerCategoriasActivas()
+BEGIN
+    SELECT id_categoria, nombre_categoria FROM Categorias WHERE activo = TRUE;
+END //
+DELIMITER ;
+
+
+
+
+
+
+-- --------CURSOS ---------
+
 DELIMITER //
 CREATE PROCEDURE InsertarCurso(
     IN p_titulo VARCHAR(255),
@@ -84,11 +142,58 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE ObtenerCursos()
+BEGIN
+    SELECT cursos.id_curso, cursos.titulo, cursos.descripcion, cursos.activo, usuarios.nombre AS instructor_nombre
+    FROM cursos
+    JOIN usuarios ON cursos.id_instructor = usuarios.idUsuario;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ActualizarEstadoCurso(
+    IN p_idCurso INT,
+    IN p_nuevoEstado INT
+)
+BEGIN
+    UPDATE cursos
+    SET activo = p_nuevoEstado
+    WHERE id_curso = p_idCurso;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerCursoPorId(
+    IN p_idCurso INT
+)
+BEGIN
+    SELECT 
+        Cursos.*, 
+        Usuarios.nombre AS nombre_creador, 
+        Categorias.nombre_categoria AS nombre_categoria 
+    FROM Cursos
+    JOIN Usuarios ON Cursos.id_instructor = Usuarios.idUsuario
+    JOIN Categorias ON Cursos.id_categoria = Categorias.id_categoria
+    WHERE Cursos.id_curso = p_idCurso;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerCursosInscritosPorUsuario(
+    IN p_idUsuario INT
+)
+BEGIN
+    SELECT i.*, c.titulo AS curso_titulo, cat.nombre_categoria AS categoria
+    FROM Inscripciones i
+    JOIN Cursos c ON i.id_curso = c.id_curso
+    JOIN Categorias cat ON c.id_categoria = cat.id_categoria
+    WHERE i.id_usuario = p_idUsuario;
+END //
+DELIMITER ;
 
 
-
-
--- NIVELES --
+-- --------NIVELES ----------
 DELIMITER //
 CREATE PROCEDURE InsertarNivel(
     IN p_id_curso INT,
@@ -132,10 +237,74 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE ObtenerNivelesPorCurso(
+    IN p_idCurso INT
+)
+BEGIN
+    SELECT * 
+    FROM Niveles 
+    WHERE id_curso = p_idCurso 
+    ORDER BY numero_nivel;
+END //
+DELIMITER ;
 
 
 
--- INSCRIPCIONES --
+-- -------COMENTARIOS ---------
+DELIMITER //
+CREATE PROCEDURE ObtenerComentario(
+    IN p_id_curso INT,
+    IN p_id_usuario INT
+)
+BEGIN
+    SELECT comentario, calificacion, fecha_comentario
+    FROM Comentarios
+    WHERE id_curso = p_id_curso AND id_usuario = p_id_usuario AND eliminado = 0;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GuardarComentario(
+    IN p_id_curso INT,
+    IN p_id_usuario INT,
+    IN p_comentario TEXT,
+    IN p_calificacion INT
+)
+BEGIN
+    INSERT INTO Comentarios (id_curso, id_usuario, comentario, calificacion)
+    VALUES (p_id_curso, p_id_usuario, p_comentario, p_calificacion);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerComentariosPorCurso(
+    IN p_idCurso INT
+)
+BEGIN
+    SELECT c.id_comentario, c.comentario, c.calificacion, c.fecha_comentario, c.id_usuario, c.eliminado,
+           u.nombre AS nombre_usuario, u.foto_avatar 
+    FROM Comentarios AS c
+    JOIN Usuarios AS u ON c.id_usuario = u.idUsuario
+    WHERE c.id_curso = p_idCurso
+    ORDER BY c.fecha_comentario DESC;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE EliminarComentarioPorId(
+    IN p_idComentario INT,
+    IN p_motivoEliminacion VARCHAR(255)
+)
+BEGIN
+    UPDATE Comentarios
+    SET eliminado = TRUE, motivo_eliminacion = p_motivoEliminacion
+    WHERE id_comentario = p_idComentario;
+END //
+DELIMITER ;
+
+
+-- -------INSCRIPCIONES ---------
 DELIMITER //
 CREATE PROCEDURE RegistrarInscripcion(
     IN p_id_curso INT,
@@ -146,6 +315,181 @@ BEGIN
     VALUES (p_id_curso, p_id_usuario, NOW(), NOW(), 0, 'en curso');
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE VerificarCompraCursoPorUsuario(
+    IN p_idCurso INT,
+    IN p_idUsuario INT,
+    OUT p_resultado INT
+)
+BEGIN
+    SELECT COUNT(*)
+    INTO p_resultado
+    FROM Inscripciones
+    WHERE id_curso = p_idCurso AND id_usuario = p_idUsuario;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ActualizarProgresoCurso(
+    IN p_idCurso INT,
+    IN p_idUsuario INT,
+    IN p_nuevoProgreso DECIMAL(5,2)
+)
+BEGIN
+    UPDATE Inscripciones
+    SET progreso = p_nuevoProgreso, fecha_ultimo_acceso = NOW()
+    WHERE id_curso = p_idCurso AND id_usuario = p_idUsuario;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerProgresoPorCursoYUsuario(
+    IN p_idCurso INT,
+    IN p_idUsuario INT,
+    OUT p_progreso DECIMAL(5,2)
+)
+BEGIN
+    SELECT progreso
+    INTO p_progreso
+    FROM Inscripciones
+    WHERE id_curso = p_idCurso AND id_usuario = p_idUsuario;
+    
+    IF p_progreso IS NULL THEN
+        SET p_progreso = 0;
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE VerificarInscripcion(
+    IN p_idCurso INT,
+    IN p_idUsuario INT,
+    OUT p_existe INT
+)
+BEGIN
+    SELECT COUNT(*) INTO p_existe
+    FROM Inscripciones
+    WHERE id_curso = p_idCurso AND id_usuario = p_idUsuario;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerDatosCertificado(
+    IN p_idCurso INT,
+    IN p_idUsuario INT
+)
+BEGIN
+    SELECT 
+        u.nombre AS nombre_estudiante,
+        c.titulo AS nombre_curso,
+        i.fecha_terminacion,
+        instructor.nombre AS nombre_instructor
+    FROM Inscripciones i
+    JOIN Usuarios u ON i.id_usuario = u.idUsuario
+    JOIN Cursos c ON i.id_curso = c.id_curso
+    JOIN Usuarios instructor ON c.id_instructor = instructor.idUsuario
+    WHERE i.id_curso = p_idCurso 
+    AND i.id_usuario = p_idUsuario 
+    AND i.completado = 1;
+END //
+DELIMITER ;
+
+
+
+
+
+-- -------VENTAS ---------
+DELIMITER //
+CREATE PROCEDURE RegistrarVentaCurso(
+    IN p_idCurso INT,
+    IN p_idUsuario INT,
+    IN p_precioPagado DECIMAL(10,2),
+    IN p_formaPago VARCHAR(255)
+)
+BEGIN
+    INSERT INTO Ventas (id_curso, id_usuario, precio_pagado, forma_pago)
+    VALUES (p_idCurso, p_idUsuario, p_precioPagado, p_formaPago);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GetCursosVentas(IN userId INT)
+BEGIN
+    SELECT c.id_curso, c.titulo, c.activo,
+           COUNT(i.id_usuario) AS alumnos_inscritos, 
+           AVG(i.progreso) AS nivel_promedio, 
+           SUM(v.precio_pagado) AS ingresos_totales
+    FROM Cursos c
+    LEFT JOIN Inscripciones i ON c.id_curso = i.id_curso
+    LEFT JOIN Ventas v ON c.id_curso = v.id_curso
+    WHERE c.id_instructor = userId
+    GROUP BY c.id_curso;
+END//
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE GetTotalesPorPago(IN userId INT)
+BEGIN
+    SELECT v.forma_pago, SUM(v.precio_pagado) AS total_ingresos
+    FROM Ventas v
+    JOIN Cursos c ON v.id_curso = c.id_curso
+    WHERE c.id_instructor = userId
+    GROUP BY v.forma_pago;
+END//
+DELIMITER ;
+
+
+-- -------MENSAJES ---------
+DELIMITER //
+CREATE PROCEDURE ObtenerInstructoresConMensajes(IN id_emisor INT)
+BEGIN
+    SELECT DISTINCT u.idUsuario, u.nombre, u.foto_avatar
+    FROM Usuarios u
+    JOIN Mensajes m 
+        ON (u.idUsuario = m.id_receptor AND m.id_emisor = id_emisor)
+        OR (u.idUsuario = m.id_emisor AND m.id_receptor = id_emisor);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE ObtenerMensajesEntreUsuarios(IN id_emisor INT, IN id_receptor INT)
+BEGIN
+    SELECT m.*, u.foto_avatar, u.nombre
+    FROM Mensajes m
+    JOIN Usuarios u ON u.idUsuario = m.id_emisor
+    WHERE (m.id_emisor = id_emisor AND m.id_receptor = id_receptor) 
+       OR (m.id_emisor = id_receptor AND m.id_receptor = id_emisor)
+    ORDER BY m.fecha_hora ASC;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE IniciarChatSiNoExiste(IN id_emisor INT, IN id_receptor INT)
+BEGIN
+    -- Verifica si ya existe un chat entre los usuarios
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM Mensajes 
+        WHERE (id_emisor = id_emisor AND id_receptor = id_receptor)
+           OR (id_emisor = id_receptor AND id_receptor = id_emisor)
+    ) THEN
+        -- Si no existe, inserta un mensaje de bienvenida
+        INSERT INTO Mensajes (id_emisor, id_receptor, mensaje) 
+        VALUES (id_emisor, id_receptor, 'Hola, este es el inicio de nuestra conversación');
+    END IF;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE EnviarMensaje(IN id_emisor INT, IN id_receptor INT, IN mensaje TEXT)
+BEGIN
+    INSERT INTO Mensajes (id_emisor, id_receptor, mensaje) 
+    VALUES (id_emisor, id_receptor, mensaje);
+END //
+DELIMITER ;
+
 
 
 -- Funcion1 ---
@@ -409,13 +753,17 @@ CREATE TRIGGER reset_intentos_fallidos
 AFTER UPDATE ON Usuarios
 FOR EACH ROW
 BEGIN
-    -- Solo agrega el idUsuario a la tabla temporal si el usuario ha sido activado
+    -- Solo agrega el idUsuario a la tabla temporal si el usuario ha sido activado y no está en la tabla ya
     IF NEW.activo = TRUE AND OLD.activo = FALSE THEN
-        INSERT INTO TempUsuariosActivados (idUsuario) VALUES (NEW.idUsuario);
+        -- Verificar si el idUsuario ya existe en la tabla temporal
+        IF NOT EXISTS (SELECT 1 FROM TempUsuariosActivados WHERE idUsuario = NEW.idUsuario) THEN
+            INSERT INTO TempUsuariosActivados (idUsuario) VALUES (NEW.idUsuario);
+        END IF;
     END IF;
-END//
+END //
 DELIMITER ;
 
+DROP TRIGGER IF EXISTS reset_intentos_fallidos;
 
 DELIMITER $$
 CREATE TRIGGER trg_update_estado_completado

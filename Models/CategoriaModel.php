@@ -26,39 +26,50 @@ class CategoriaModel
 
     public function obtenerCategorias($id_creador)
     {
-        $query = "SELECT id_categoria, nombre_categoria, descripcion, activo FROM Categorias WHERE id_creador = :id_creador";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_creador', $id_creador, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "CALL ObtenerCategorias(:id_creador)";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id_creador', $id_creador, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener las categorías: " . $e->getMessage();
+            return false;
+        }
     }
 
     public function getAllCategorias()
     {
-        $query = "SELECT id_categoria, nombre_categoria FROM Categorias";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "CALL GetAllCategorias()";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener todas las categorías: " . $e->getMessage();
+            return false;
+        }
     }
 
     // Método para actualizar el nombre y la descripción de una categoría
     public function actualizarCategoria($id_categoria, $nombre_categoria, $descripcion)
     {
-        $query = "UPDATE Categorias SET nombre_categoria = :nombre_categoria, descripcion = :descripcion WHERE id_categoria = :id_categoria";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL ActualizarCategoria(:id_categoria, :nombre_categoria, :descripcion)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id_categoria', $id_categoria, PDO::PARAM_INT);
         $stmt->bindParam(':nombre_categoria', $nombre_categoria);
         $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':id_categoria', $id_categoria, PDO::PARAM_INT);
         return $stmt->execute();
     }
 
     // Método para cambiar el estado de una categoría (activar/desactivar)
     public function cambiarEstadoCategoria($id_categoria, $nuevoEstado)
     {
-        $query = "UPDATE Categorias SET activo = :nuevoEstado WHERE id_categoria = :id_categoria";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':nuevoEstado', $nuevoEstado, PDO::PARAM_BOOL);
+        $sql = "CALL CambiarEstadoCategoria(:id_categoria, :nuevoEstado)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id_categoria', $id_categoria, PDO::PARAM_INT);
+        $stmt->bindParam(':nuevoEstado', $nuevoEstado, PDO::PARAM_BOOL);
         return $stmt->execute();
     }
 }

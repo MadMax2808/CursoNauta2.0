@@ -10,58 +10,59 @@ class VentasModel
 
     public function getCursosVentas($userId)
     {
-        $query = "SELECT c.id_curso, c.titulo, c.activo, -- Añadimos c.activo aquí
-                     COUNT(i.id_usuario) AS alumnos_inscritos, 
-                     AVG(i.progreso) AS nivel_promedio, 
-                     SUM(v.precio_pagado) AS ingresos_totales
-              FROM Cursos c
-              LEFT JOIN Inscripciones i ON c.id_curso = i.id_curso
-              LEFT JOIN Ventas v ON c.id_curso = v.id_curso
-              WHERE c.id_instructor = :userId
-              GROUP BY c.id_curso";
+        try {
+            // Preparar y ejecutar el procedimiento almacenado
+            $query = "CALL GetCursosVentas(:userId)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt->execute();
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Retornar los resultados
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los cursos y ventas: " . $e->getMessage();
+            return [];
+        }
     }
 
     public function getTotalesPorPago($userId)
     {
-        $query = "SELECT v.forma_pago, SUM(v.precio_pagado) AS total_ingresos
-                  FROM Ventas v
-                  JOIN Cursos c ON v.id_curso = c.id_curso
-                  WHERE c.id_instructor = :userId
-                  GROUP BY v.forma_pago";
+        try {
+            // Preparar y ejecutar el procedimiento almacenado
+            $query = "CALL GetTotalesPorPago(:userId)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt->execute();
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Retornar los resultados
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los totales por pago: " . $e->getMessage();
+            return [];
+        }
     }
 
     public function getDetallesCurso($idCurso)
-{
-    $query = "SELECT u.nombre AS alumno, i.fecha_inscripcion, i.progreso, v.precio_pagado, v.forma_pago, c.titulo AS titulo
-              FROM Inscripciones i
-              JOIN Usuarios u ON i.id_usuario = u.idUsuario
-              JOIN Ventas v ON i.id_curso = v.id_curso AND i.id_usuario = v.id_usuario
-              JOIN Cursos c ON i.id_curso = c.id_curso
-              WHERE i.id_curso = :idCurso";
-
-    $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
-    $stmt->execute();
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-
-    public function getCatActivas() {
+    {
         try {
-            $query = "SELECT id_categoria, nombre_categoria FROM Categorias WHERE activo = TRUE";
+            // Preparar y ejecutar el procedimiento almacenado
+            $query = "CALL GetDetallesCurso(:idCurso)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+            $stmt->execute();
+
+            // Retornar los resultados
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los detalles del curso: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function getCatActivas()
+    {
+        try {
+            $query = "CALL ObtenerCategoriasActivas()";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -71,7 +72,8 @@ class VentasModel
         }
     }
 
-    public function buscarVentasDinamico($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID) {
+    public function buscarVentasDinamico($categoriaID, $estado, $fechaInicio, $fechaFin, $usuarioID)
+    {
         try {
             $query = $this->conn->prepare("CALL BuscarVentasDinamico(:categoriaID, :estado, :fechaInicio, :fechaFin, :usuarioID)");
 
@@ -91,5 +93,4 @@ class VentasModel
             return [];
         }
     }
-
 }

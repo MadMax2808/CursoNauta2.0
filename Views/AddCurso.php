@@ -58,11 +58,11 @@ $categorias = $controller->obtenerCategorias();
                     </div>
                     <div class="field">
                         <label for="course-price">Costo del curso completo:</label>
-                        <input type="number" id="course-price" name="course_price" step="0.01">
+                        <input type="number" id="course-price" name="course_price" step="0.00">
                     </div>
                     <div class="field">
                         <label for="level-price">Costo por nivel (opcional):</label>
-                        <input type="number" id="level-price" name="level_price" step="0.01">
+                        <input type="number" id="level-price" name="level_price" step="0.00">
                     </div>
                 </div>
 

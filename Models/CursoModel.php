@@ -51,38 +51,25 @@ class CursoModel
     }
     public function obtenerCursos()
     {
-        $query = "
-            SELECT cursos.id_curso, cursos.titulo, cursos.descripcion, cursos.activo, usuarios.nombre AS instructor_nombre
-            FROM cursos
-            JOIN usuarios ON cursos.id_instructor = usuarios.idUsuario
-        ";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL ObtenerCursos()";
+        $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function actualizarEstadoCurso($idCurso, $nuevoEstado)
     {
-        $query = "UPDATE cursos SET activo = :nuevoEstado WHERE id_curso = :idCurso";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':nuevoEstado', $nuevoEstado, PDO::PARAM_INT);
+        $sql = "CALL ActualizarEstadoCurso(:idCurso, :nuevoEstado)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->bindParam(':nuevoEstado', $nuevoEstado, PDO::PARAM_INT);
         return $stmt->execute();
     }
 
     public function obtenerCursoPorId($idCurso)
     {
-        $query = "
-        SELECT 
-            Cursos.*, 
-            Usuarios.nombre AS nombre_creador, 
-            Categorias.nombre_categoria AS nombre_categoria 
-        FROM Cursos
-        JOIN Usuarios ON Cursos.id_instructor = Usuarios.idUsuario
-        JOIN Categorias ON Cursos.id_categoria = Categorias.id_categoria
-        WHERE Cursos.id_curso = :idCurso
-    ";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL ObtenerCursoPorId(:idCurso)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -90,8 +77,8 @@ class CursoModel
 
     public function obtenerNivelesPorCurso($idCurso)
     {
-        $query = "SELECT * FROM Niveles WHERE id_curso = :idCurso ORDER BY numero_nivel";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL obtenerNivelesPorCurso(:idCurso)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -115,62 +102,65 @@ class CursoModel
 
     public function obtenerComentarios($idCurso)
     {
-        $stmt = $this->conn->prepare("
-            SELECT c.id_comentario, c.comentario, c.calificacion, c.fecha_comentario, c.id_usuario, c.eliminado,
-                   u.nombre AS nombre_usuario, u.foto_avatar 
-            FROM Comentarios AS c
-            JOIN Usuarios AS u ON c.id_usuario = u.idUsuario
-            WHERE c.id_curso = ?
-            ORDER BY c.fecha_comentario DESC
-        ");
-        $stmt->execute([$idCurso]);
+        $sql = "CALL ObtenerComentariosPorCurso(:idCurso)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
     public function eliminarComentario($idComentario, $motivoEliminacion)
     {
-        $query = "UPDATE Comentarios SET eliminado = TRUE, motivo_eliminacion = :motivo WHERE id_comentario = :id_comentario";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL eliminarComentarioPorId(:idComentario, :motivoEliminacion)";
+        $stmt = $this->conn->prepare($sql);
 
         // Vincular parámetros
-        $stmt->bindParam(':motivo', $motivoEliminacion);
-        $stmt->bindParam(':id_comentario', $idComentario, PDO::PARAM_INT);
+        $stmt->bindParam(':idComentario', $idComentario, PDO::PARAM_INT);
+        $stmt->bindParam(':motivoEliminacion', $motivoEliminacion, PDO::PARAM_STR);
 
         return $stmt->execute();
     }
-    
+
     public function verificarCompraCurso($idCurso, $idUsuario)
     {
-        $query = "SELECT COUNT(*) FROM Inscripciones WHERE id_curso = :idCurso AND id_usuario = :idUsuario";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL VerificarCompraCursoPorUsuario(:idCurso, :idUsuario, @resultado)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
         $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
         $stmt->execute();
-        $result = $stmt->fetchColumn();
 
-        return $result > 0; // Retorna true si el usuario compró el curso
+        // Obtener el valor del resultado
+        $stmt = $this->conn->prepare("SELECT @resultado");
+        $stmt->execute();
+        $resultado = $stmt->fetchColumn();
+
+        return $resultado > 0; // Retorna true si el usuario compró el curso
     }
 
     public function actualizarProgreso($idCurso, $idUsuario, $nuevoProgreso)
     {
-        $query = "UPDATE Inscripciones SET progreso = :nuevoProgreso, fecha_ultimo_acceso = NOW() WHERE id_curso = :idCurso AND id_usuario = :idUsuario";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':nuevoProgreso', $nuevoProgreso);
+        $sql = "CALL ActualizarProgresoCurso(:idCurso, :idUsuario, :nuevoProgreso)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
         $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
+        $stmt->bindParam(':nuevoProgreso', $nuevoProgreso, PDO::PARAM_STR); // Usamos DECIMAL para el progreso
         return $stmt->execute();
     }
 
     public function obtenerProgreso($idCurso, $idUsuario)
     {
-        $query = "SELECT progreso FROM Inscripciones WHERE id_curso = :idCurso AND id_usuario = :idUsuario";
-        $stmt = $this->conn->prepare($query);
+        $sql = "CALL obtenerProgresoPorCursoYUsuario(:idCurso, :idUsuario, @progreso)";
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idCurso', $idCurso, PDO::PARAM_INT);
         $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
         $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result ? $result['progreso'] : 0; // Devuelve 0 si no hay progreso registrado
+        // Obtener el valor del progreso
+        $stmt = $this->conn->prepare("SELECT @progreso");
+        $stmt->execute();
+        $progreso = $stmt->fetchColumn();
+
+        return $progreso; // Devuelve el progreso o 0 si no existe
     }
 
     public function actualizarCurso($id_curso, $titulo, $descripcion, $imagen, $costo, $id_categoria)
@@ -193,13 +183,12 @@ class CursoModel
     {
         $query = "CALL ActualizarNivel(:id_nivel, :titulo_nivel, :contenido, :costo)";
         $stmt = $this->conn->prepare($query);
-    
+
         $stmt->bindParam(':id_nivel', $id_nivel);
         $stmt->bindParam(':titulo_nivel', $titulo_nivel);
         $stmt->bindParam(':contenido', $contenido);
         $stmt->bindParam(':costo', $costo);
-    
+
         return $stmt->execute();
     }
-
 }
