@@ -59,15 +59,14 @@ class InscripcionModel
     public function inscripcionYaRegistrada($idCurso, $idUsuario)
     {
         try {
-            $sql = "CALL verificarInscripcion(:id_curso, :id_usuario, @p_existe)";
-            $stmt = $this->conn->prepare($sql);
+            $query = "SELECT inscripcionYaRegistrada(:id_curso, :id_usuario) AS yaRegistrada";
+            $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_curso', $idCurso, PDO::PARAM_INT);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->execute();
-
-            // Obtener el valor del parámetro de salida
-            $result = $this->conn->query("SELECT @p_existe")->fetch(PDO::FETCH_ASSOC);
-            return $result['@p_existe'] > 0; // Retorna true si ya existe una inscripción, false si no
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['yaRegistrada'] > 0; // Retorna true si ya existe una inscripción, false si no
         } catch (PDOException $e) {
             echo "Error al verificar la inscripción: " . $e->getMessage();
             return false;

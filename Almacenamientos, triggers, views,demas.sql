@@ -525,7 +525,20 @@ BEGIN
 END //
 DELIMITER ;
 
+DELIMITER $$
+CREATE FUNCTION inscripcionYaRegistrada(idCurso INT, idUsuario INT) 
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE resultado INT;
 
+    SELECT COUNT(*) INTO resultado
+    FROM Inscripciones
+    WHERE id_curso = idCurso AND id_usuario = idUsuario;
+
+    RETURN resultado;
+END $$
+DELIMITER ;
 
 
 -- VIEWS --

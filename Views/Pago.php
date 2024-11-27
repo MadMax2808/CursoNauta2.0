@@ -4,6 +4,8 @@
 
 <?php include 'Views/Parciales/Nav.php'; ?>
 
+<script src="https://www.paypal.com/sdk/js?client-id=Ac5-Kx3acJx2PoCJIdATrba8NYWTTOuHlkcCZnHxUusatujaBIlPZG9L0FK5hBeoOYLDxz7qB-WFe3KJ&currency=MXN"></script>
+
 <?php
 require_once 'Controllers/CursoController.php';
 
@@ -47,9 +49,13 @@ if ($idCurso > 0) {
                     <input type="hidden" name="forma_pago" id="forma_pago">
                     <input type="hidden" name="precio_pagado" id="precio_pagado">
 
+                    <div id="paypal-button-container"></div>
+
                     <button type="button" class="purchase-btn" onclick="processPurchase(<?php echo $idCurso; ?>, <?php echo $curso['costo']; ?>)">
                         Comprar Ahora
                     </button>
+
+                    
                 </form>
 
             </div>
@@ -59,5 +65,53 @@ if ($idCurso > 0) {
 
 
 <script src="Views\js\JPago.js"> </script>
+<script>
+    paypal.Buttons({
+        style: {
+            color: 'blue',
+            shape: 'pill',
+            label: 'pay'
+        },
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: <?php echo $curso['costo']; ?> // Aquí defines el monto a cobrar
+                    }
+                }]
+            });
+        },
+        
+        createOrder:function(data, actions){
+            return actions.order.create({
+                purchase_units:[{
+                    amount: {
+                        value: <?php echo $curso['costo']; ?>
+                    }
+                }]
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                processPurchase(<?php echo $idCurso; ?>, <?php echo $curso['costo']; ?>)
+                alert('Transacción completada por ' + details.payer.name.given_name);
+                // Aquí puedes redirigir o ejecutar más código según lo necesites
+                window.location.href="PagoExitoso.php"
+            });
+        },
+
+        
+        onCancel:function(data){
+            alert('Pago cancelado');
+            console.log(data);
+
+        },
+        onError: function(err) {
+            console.error(err);
+            alert('Hubo un problema al procesar el pago');
+        }
+    }).render('#paypal-button-container');
+</script>
 
 <?php include 'Views/Parciales/Footer.php'; ?>
